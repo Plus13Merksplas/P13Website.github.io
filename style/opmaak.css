@@ -133,7 +133,7 @@ button {
 iframe {
     margin: auto;
     display: block;
-    height: auto;
+    height: 1600;
 }
 
 #image-container {
