@@ -166,7 +166,7 @@ footer {
     iframe {
         margin: auto;
         display: block;
-        height: 2000px; /* Pas de hoogte aan voor kleinere schermen */
+        height: 2200px; /* Pas de hoogte aan voor kleinere schermen */
     }
 }
 
@@ -176,7 +176,7 @@ footer {
     }
 
     iframe {
-        height: 2000px; /* Vaste hoogte voor mobiele schermen */
+        height: 2200px; /* Vaste hoogte voor mobiele schermen */
         width: 100%; /* Zorg ervoor dat het iframe de volledige breedte gebruikt */
     }
 }
