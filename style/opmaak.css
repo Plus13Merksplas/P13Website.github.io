@@ -167,6 +167,7 @@ footer {
         margin: auto;
         display: block;
         height: 2500px; /* Pas de hoogte aan voor kleinere schermen */
+        width: 100%
     }
 }
 
