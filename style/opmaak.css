@@ -197,7 +197,7 @@ iframe {
     margin: auto;
     display: block;
     width: 100%; /* Zorg ervoor dat het iframe de volledige breedte gebruikt */
-    height: 2500px; /* Vaste hoogte voor het iframe */
+    height: 2200px; /* Vaste hoogte voor het iframe */
     border: none; /* Verberg de rand als dat gewenst is */
 }
 
