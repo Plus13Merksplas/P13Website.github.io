@@ -387,5 +387,9 @@ iframe {
         width: 100%;
         max-width: none;
     }
+
+    .formScroll{
+        width: 75%;
+    }
 }
 
