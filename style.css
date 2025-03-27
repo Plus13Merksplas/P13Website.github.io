@@ -47,6 +47,10 @@ nav{
     text-decoration: underline;
 }
 
+.navbar-brand:hover{
+    color: #add8e6;
+}
+
 .navbar-toggler-icon {
     filter: invert(1);
 }
