@@ -15,23 +15,31 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-    <header class="d-flex flex-column flex-md-row p-3">
-        <div class="d-flex align-items-center mb-3 mb-md-0">
-            <a href="../index.html"><img alt="P13 Logo" src="../img/logoP13.svg"></a>
-            <h2 class="ms-3">Plus 13 Merksplas</h2>
-        </div>
-        <nav>
-            <ul class="d-flex flex-row list-unstyled mb-0">
-                <li class="mb-2 mb-md-0 ms-md-3 me-2"><a href="../index.html" class="text-decoration-none">Home</a></li>
-                <li class="mb-2 mb-md-0 ms-md-3 me-2"><a href="inschrijven.html"
-                        class="text-decoration-none">Inschrijven</a></li>
-                <li class="mb-2 mb-md-0 ms-md-3 me-2"><a href="#" class="text-decoration-none">Foto's</a></li>
-                <li class="mb-2 mb-md-0 ms-md-3 me-2"><a href="begeleiding.html" class="text-decoration-none">Begeleiding</a></li>
-                <li class="mb-2 mb-md-0 ms-md-3 me-2"><a href="plusBarTien.html" class="text-decoration-none">PlusBarTien</a></li>
-                <li class="mb-2 mb-md-0 ms-md-3"><a href="contact.html" class="text-decoration-none">Contact</a></li>
-            </ul>
+    <header class="p-3">
+        <nav class="navbar navbar-expand-md">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="index.html">
+                    <img alt="P13 Logo" src="../img/logoP13.svg" height="40">
+                    Plus 13 Merksplas
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link" href="../index.html">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="inschrijven.html">Inschrijven</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Foto's</a></li>
+                        <li class="nav-item"><a class="nav-link" href="begeleiding.html">Begeleiding</a></li>
+                        <li class="nav-item"><a class="nav-link" href="plusBarTien.html">PlusBarTien</a></li>
+                        <li class="nav-item"><a class="nav-link" href="tappers.html">Tappers nodig?</a></li>
+                        <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
         </nav>
     </header>
+
     <main class="container">
         <div class="row justify-content-center">
 
@@ -87,4 +95,7 @@
                 class="fab fa-facebook"></i></a>
     </footer>
 
+    <script src="../scripts/dropDown.js"></script>
+
 </body>
+</html>
