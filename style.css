@@ -112,3 +112,12 @@ iframe {
         color: blue;
     }
 }
+
+.notFound a{
+    color: blue;
+    text-decoration: underline;
+}
+
+.notFound a:hover{
+    color: black;
+}
