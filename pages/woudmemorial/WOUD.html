@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Galerij — WOUD foto's & filmpje</title>
+  <style>
+    :root{--gap:10px}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;margin:0;background:#f7fafc;color:#111}
+    .wrap{max-width:1100px;margin:28px auto;padding:16px}
+    h1{margin:0 0 8px;font-size:1.4rem}
+    p{margin:0 0 18px;color:#555}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:var(--gap)}
+    .item{position:relative;overflow:hidden;border-radius:8px;background:#ddd;cursor:pointer}
+    .item img,.item video{display:block;width:100%;height:160px;object-fit:cover}
+    .label{position:absolute;left:8px;bottom:8px;padding:6px 8px;background:rgba(0,0,0,.5);color:#fff;font-size:12px;border-radius:6px}
+
+    .lightbox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.7);z-index:999}
+    .lightbox.open{display:flex}
+    .lightbox-content{max-width:90%;max-height:85%;background:#000;padding:12px;border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,.6)}
+    .lightbox-content img,.lightbox-content video{max-width:100%;max-height:80vh;display:block}
+    .controls{display:flex;justify-content:space-between;align-items:center;margin-top:8px;color:#fff}
+    .btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#fff;padding:8px 12px;border-radius:6px;cursor:pointer}
+    .btn:focus{outline:2px solid #fff}
+
+    @media (max-width:420px){.item img,.item video{height:120px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Galerij — 15 WOUD-foto's & 1 filmpje</h1>
+    <p>Klik op een thumbnail om te vergroten. Gebruik ◀ ▶ of Esc om te navigeren/sluiten.</p>
+
+    <div class="grid" id="gallery">
+      <!-- 15 WOUD images -->
+      <div class="item" data-type="image" data-src="WOUD/WOUD (1).jpeg"><img src="WOUD/WOUD (1).jpeg" alt="WOUD 1"><span class="label">WOUD 1</span></div>
+      <div class="item" data-type="image" data-src="WOUD/WOUD (2).jpeg"><img src="WOUD/WOUD (2).jpeg" alt="WOUD 2"><span class="label">WOUD 2</span></div>
+      <div class="item" data-type="image" data-src="WOUD/WOUD (3).jpeg"><img src="WOUD/WOUD (3).jpeg" alt="WOUD 3"><span class="label">WOUD 3</span></div>
+      <div class="item" data-type="image" data-src="WOUD/WOUD (4).jpeg"><img src="WOUD/WOUD (4).jpeg" alt="WOUD 4"><span class="label">WOUD 4</span></div>
+      <div class="item" data-type="image" data-src="WOUD/WOUD (5).jpeg"><img src="WOUD/WOUD (5).jpeg" alt="WOUD 5"><span class="label">WOUD 5</span></div>
+      <div class="item" data-type="image" data-src="WOUD/WOUD (6).jpeg"><img src="WOUD/WOUD (6).jpeg" alt="WOUD 6"><span class="label">WOUD 6</span></div>
+      <div class="item" data-type="image" data-src="WOUD/WOUD (7).jpeg"><img src="WOUD/WOUD (7).jpeg" alt="WOUD 7"><span class="label">WOUD 7</span></div>
+      <div class="item" data-type="image" data-src="WOUD/WOUD (8).jpeg"><img src="WOUD/WOUD (8).jpeg" alt="WOUD 8"><span class="label">WOUD 8</span></div>
+      <div class="item" data-type="image" data-src="WOUD/WOUD (9).jpeg"><img src="WOUD/WOUD (9).jpeg" alt="WOUD 9"><span class="label">WOUD 9</span></div>
+      <div class="item" data-type="image" data-src="WOUD/WOUD (10).jpeg"><img src="WOUD/WOUD (10).jpeg" alt="WOUD 10"><span class="label">WOUD 10</span></div>
+      <div class="item" data-type="image" data-src="WOUD/WOUD (11).jpeg"><img src="WOUD/WOUD (11).jpeg" alt="WOUD 11"><span class="label">WOUD 11</span></div>
+      <div class="item" data-type="image" data-src="WOUD/WOUD (12).jpeg"><img src="WOUD/WOUD (12).jpeg" alt="WOUD 12"><span class="label">WOUD 12</span></div>
+      <div class="item" data-type="image" data-src="WOUD/WOUD (13).jpeg"><img src="WOUD/WOUD (13).jpeg" alt="WOUD 13"><span class="label">WOUD 13</span></div>
+      <div class="item" data-type="image" data-src="WOUD/WOUD (14).jpeg"><img src="WOUD/WOUD (14).jpeg" alt="WOUD 14"><span class="label">WOUD 14</span></div>
+      <div class="item" data-type="image" data-src="WOUD/WOUD (15).jpeg"><img src="WOUD/WOUD (15).jpeg" alt="WOUD 15"><span class="label">WOUD 15</span></div>
+
+      <!-- WOUD video -->
+      <div class="item" data-type="video" data-src="WOUD/WOUDVID.mp4" data-poster="WOUD/WOUD (1).jpeg">
+        <img src="WOUD/WOUD (1).jpeg" alt="WOUD Filmpje"><span class="label">WOUD Filmpje</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="lightbox" class="lightbox" aria-hidden="true">
+    <div class="lightbox-content" role="dialog" aria-modal="true">
+      <div id="mediaContainer"></div>
+      <div class="controls">
+        <div>
+          <button id="prevBtn" class="btn" aria-label="Vorige">◀ Vorige</button>
+          <button id="nextBtn" class="btn" aria-label="Volgende">Volgende ▶</button>
+        </div>
+        <div>
+          <button id="closeBtn" class="btn">Sluiten ✕</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const gallery = Array.from(document.querySelectorAll('#gallery .item'));
+      const lightbox = document.getElementById('lightbox');
+      const container = document.getElementById('mediaContainer');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const closeBtn = document.getElementById('closeBtn');
+      let idx = 0;
+
+      function open(i){
+        idx = i;
+        render();
+        lightbox.classList.add('open');
+        lightbox.setAttribute('aria-hidden','false');
+        document.body.style.overflow = 'hidden';
+        closeBtn.focus();
+      }
+
+      function close(){
+        lightbox.classList.remove('open');
+        lightbox.setAttribute('aria-hidden','true');
+        container.innerHTML = '';
+        document.body.style.overflow = '';
+      }
+
+      function prev(){ idx = (idx - 1 + gallery.length) % gallery.length; render(); }
+      function next(){ idx = (idx + 1) % gallery.length; render(); }
+
+      function render(){
+        const item = gallery[idx];
+        const type = item.dataset.type;
+        const src = item.dataset.src;
+        container.innerHTML = '';
+        if(type === 'image'){
+          const img = document.createElement('img');
+          img.src = src; img.alt = item.querySelector('img')?.alt || '';
+          container.appendChild(img);
+        } else {
+          const vid = document.createElement('video');
+          vid.src = src; vid.controls = true; vid.autoplay = true; vid.loop = false; vid.playsInline = true;
+          if(item.dataset.poster) vid.poster = item.dataset.poster;
+          container.appendChild(vid);
+        }
+      }
+
+      gallery.forEach((el,i)=> el.addEventListener('click', ()=> open(i)));
+      prevBtn.addEventListener('click', prev);
+      nextBtn.addEventListener('click', next);
+      closeBtn.addEventListener('click', close);
+      lightbox.addEventListener('click', (e)=> { if(e.target === lightbox) close(); });
+
+      window.addEventListener('keydown', (e)=>{
+        if(lightbox.classList.contains('open')){
+          if(e.key === 'Escape') close();
+          if(e.key === 'ArrowLeft') prev();
+          if(e.key === 'ArrowRight') next();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
