@@ -1,0 +1,352 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Special+Elite&display=swap');
+
+:root {
+    --night: #050505;
+    --midnight: #0a0b12;
+    --charcoal: #16171f;
+    --blood: #b31217;
+    --ember: #f55c47;
+    --ash: #d7d2c8;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Special Elite', 'Courier New', monospace;
+    color: var(--ash);
+    background-color: var(--night);
+    background-image:
+        radial-gradient(circle at 20% 20%, rgba(179, 18, 23, 0.25), transparent 50%),
+        radial-gradient(circle at 80% 0%, rgba(255, 77, 77, 0.2), transparent 55%),
+        linear-gradient(135deg, #020204, #0a0b12 45%, #050505);
+    min-height: 100vh;
+    letter-spacing: 0.03em;
+}
+
+.evil-body {
+    position: relative;
+    overflow-x: hidden;
+}
+
+header,
+main,
+footer {
+    position: relative;
+    z-index: 1;
+}
+
+.texture-overlay {
+    position: fixed;
+    inset: 0;
+    background-image:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0, rgba(255, 255, 255, 0.02) 2px, transparent 2px, transparent 4px),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.01) 0, rgba(255, 255, 255, 0.01) 1px, transparent 1px, transparent 3px);
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.evil-nav {
+    background: rgba(10, 11, 18, 0.85);
+    border: 1px solid rgba(179, 18, 23, 0.35);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+}
+
+.navbar-brand {
+    font-family: 'Cinzel', 'Times New Roman', serif;
+    font-size: 1.15rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ash);
+}
+
+.navbar-brand img {
+    filter: drop-shadow(0 0 6px rgba(179, 18, 23, 0.8));
+    margin-right: 0.35rem;
+}
+
+.nav-link {
+    color: var(--ash) !important;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0.2rem;
+    width: 100%;
+    height: 2px;
+    background: var(--blood);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.3s ease;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+    color: var(--ember) !important;
+}
+
+.nav-link:hover::after,
+.nav-link:focus::after {
+    transform: scaleX(1);
+}
+
+.omen-bar {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.75rem 0;
+    font-size: 0.85rem;
+    letter-spacing: 0.25em;
+    color: var(--ember);
+    text-shadow: 0 0 8px rgba(179, 18, 23, 0.5);
+    animation: flicker 4s infinite;
+}
+
+.omen-label {
+    margin-right: 0.5rem;
+    color: var(--ash);
+}
+
+.omen-date {
+    font-weight: 700;
+    color: var(--ember);
+    margin-right: 0.5rem;
+}
+
+.omen-detail {
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.shadow-realm {
+    background: rgba(11, 12, 20, 0.85);
+    border: 1px solid rgba(179, 18, 23, 0.35);
+    border-radius: 1.25rem;
+    box-shadow: 0 50px 120px rgba(0, 0, 0, 0.65);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.shadow-realm::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 20%, rgba(179, 18, 23, 0.25), transparent 60%);
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.photo-frame {
+    position: relative;
+    border: 2px solid rgba(179, 18, 23, 0.6);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 35px 80px rgba(0, 0, 0, 0.8);
+}
+
+.groepsfoto {
+    width: 100%;
+    display: block;
+    filter: grayscale(0.2) contrast(1.1) brightness(0.9);
+}
+
+.photo-glare,
+.blood-drip {
+    display: block;
+    pointer-events: none;
+}
+
+.photo-glare {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0.1), transparent 50%);
+    mix-blend-mode: screen;
+}
+
+.blood-drip {
+    position: absolute;
+    top: 0;
+    right: 15%;
+    width: 6px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--ember), var(--blood));
+    animation: drip 3s infinite;
+    box-shadow: 0 0 8px rgba(179, 18, 23, 0.7);
+}
+
+.prophecy-card {
+    position: relative;
+    background: rgba(5, 5, 5, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: inset 0 0 30px rgba(179, 18, 23, 0.25);
+    z-index: 1;
+}
+
+.prophecy-card::after {
+    content: "";
+    position: absolute;
+    inset: 1rem;
+    border: 1px dashed rgba(179, 18, 23, 0.4);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.prophecy-card h1 {
+    font-family: 'Cinzel', 'Times New Roman', serif;
+    font-size: 2.5rem;
+    letter-spacing: 0.1em;
+    color: var(--ember);
+}
+
+.prophecy-card p {
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.7;
+}
+
+.eyebrow {
+    font-size: 0.85rem;
+    letter-spacing: 0.4em;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.omen-list li {
+    border-left: 3px solid rgba(179, 18, 23, 0.7);
+    padding-left: 1rem;
+    margin-bottom: 1rem;
+}
+
+.omen-list .label {
+    display: block;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+}
+
+.omen-list strong {
+    display: block;
+    font-size: 1.15rem;
+    color: var(--ash);
+}
+
+.cta-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.btn-ritual {
+    background: var(--blood);
+    color: #fff;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 0.75rem 2rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-ritual:hover {
+    box-shadow: 0 0 20px rgba(179, 18, 23, 0.8);
+    transform: translateY(-2px);
+    color: #fff;
+}
+
+.link-ghost {
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.85rem;
+}
+
+.link-ghost:hover {
+    color: var(--ember);
+}
+
+.evil-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(5, 5, 5, 0.8);
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 0.3em;
+}
+
+.social {
+    color: rgba(255, 255, 255, 0.6);
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.social:hover {
+    color: var(--ember);
+    transform: translateY(-2px);
+}
+
+@keyframes drip {
+    0% {
+        height: 40px;
+        opacity: 0.9;
+        transform: translateY(0);
+    }
+    70% {
+        height: 120px;
+        opacity: 0.6;
+    }
+    100% {
+        height: 40px;
+        opacity: 0.9;
+        transform: translateY(20px);
+    }
+}
+
+@keyframes flicker {
+    0%,
+    100% {
+        opacity: 0.9;
+    }
+    45% {
+        opacity: 0.65;
+    }
+    50% {
+        opacity: 1;
+    }
+    55% {
+        opacity: 0.7;
+    }
+}
+
+@media (max-width: 991px) {
+    .shadow-realm {
+        padding: 1.5rem;
+    }
+
+    .prophecy-card {
+        margin-top: 1rem;
+    }
+}
+
+@media (max-width: 575px) {
+    .omen-bar {
+        letter-spacing: 0.1em;
+        font-size: 0.75rem;
+    }
+
+    .btn-ritual {
+        width: 100%;
+        margin-bottom: 0.75rem;
+    }
+
+    .cta-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
