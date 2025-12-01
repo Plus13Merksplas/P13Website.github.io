@@ -54,6 +54,12 @@ nav {
     text-decoration: underline;
 }
 
+.nav-link.active {
+    color: #00bcf2;       /* De felle blauwe kleur van het logo */
+    font-weight: bold;    /* Maakt de tekst dikgedrukt zodat het extra opvalt */
+    text-decoration: underline; /* Optioneel: als je ook een streepje eronder wilt */
+}
+
 .navbar-toggler-icon {
     filter: invert(1);
 }
@@ -184,4 +190,5 @@ iframe {
 
 .notFound a:hover {
     color: black;
+
 }
