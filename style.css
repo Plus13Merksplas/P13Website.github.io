@@ -192,3 +192,8 @@ iframe {
     color: black;
 
 }
+/* Wees héél specifiek: In de nav, een element met class nav-link én active */
+nav .nav-link.active {
+    color: #00bcf2 !important;  /* Forceer de lichtblauwe kleur */
+    opacity: 1 !important;      /* Zorgt dat hij niet doorzichtig/grijs is */
+}
