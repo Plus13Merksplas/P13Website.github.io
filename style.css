@@ -178,28 +178,32 @@ legend {
     color: #000;
     margin-bottom: 0;
 }
-/* 1. De Placeholder: reserveer de ruimte */
+/* 1. De Placeholder: De zwarte balk staat direct klaar */
 #nav-placeholder {
-    min-height: 80px;      /* De berekende hoogte */
-    background-color: #222c34; /* Jouw donkere kleur, zodat het flitsen stopt */
-    display: block;
-    width: 100%;
-    position: sticky;      /* Zorg dat de lege ruimte ook blijft plakken */
+    height: 82px;              /* Exacte hoogte om de 'jump' te stoppen */
+    background-color: #222c34; /* Direct de juiste kleur */
+    position: sticky;
     top: 0;
     z-index: 1000;
-    opacity: 0;            /* Start onzichtbaar voor de fade-in */
-    transition: opacity 0.2s ease-in;
+    display: block;
+    width: 100%;
+    overflow: hidden;          /* Voorkomt dat inhoud eruit lekt tijdens laden */
 }
 
-/* 2. Zodra geladen: maak zichtbaar */
-#nav-placeholder.loaded {
+/* 2. De inhoud die erin komt (de nav) fadet in */
+#nav-placeholder nav {
+    opacity: 0;
+    transition: opacity 0.3s ease-in;
+}
+
+#nav-placeholder.loaded nav {
     opacity: 1;
 }
 
-/* 3. Mobiele fix (als de burger-menu knop de bar iets hoger maakt) */
+/* 3. Mobiele fix: Op mobiel is de bar vaak iets minder hoog */
 @media (max-width: 767px) {
     #nav-placeholder {
-        min-height: 72px; /* Op mobiel is padding soms net iets compacter */
+        height: 72px; 
     }
 }
 iframe {
@@ -220,4 +224,5 @@ nav .nav-link.active {
     color: #00bcf2 !important;  /* Forceer de lichtblauwe kleur */
     opacity: 1 !important;      /* Zorgt dat hij niet doorzichtig/grijs is */
 }
+
 
