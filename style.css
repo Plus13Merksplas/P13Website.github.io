@@ -178,7 +178,30 @@ legend {
     color: #000;
     margin-bottom: 0;
 }
+/* 1. De Placeholder: reserveer de ruimte */
+#nav-placeholder {
+    min-height: 80px;      /* De berekende hoogte */
+    background-color: #222c34; /* Jouw donkere kleur, zodat het flitsen stopt */
+    display: block;
+    width: 100%;
+    position: sticky;      /* Zorg dat de lege ruimte ook blijft plakken */
+    top: 0;
+    z-index: 1000;
+    opacity: 0;            /* Start onzichtbaar voor de fade-in */
+    transition: opacity 0.2s ease-in;
+}
 
+/* 2. Zodra geladen: maak zichtbaar */
+#nav-placeholder.loaded {
+    opacity: 1;
+}
+
+/* 3. Mobiele fix (als de burger-menu knop de bar iets hoger maakt) */
+@media (max-width: 767px) {
+    #nav-placeholder {
+        min-height: 72px; /* Op mobiel is padding soms net iets compacter */
+    }
+}
 iframe {
     width: 100%;
 }
@@ -197,3 +220,4 @@ nav .nav-link.active {
     color: #00bcf2 !important;  /* Forceer de lichtblauwe kleur */
     opacity: 1 !important;      /* Zorgt dat hij niet doorzichtig/grijs is */
 }
+
