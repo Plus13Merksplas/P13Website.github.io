@@ -1,39 +1,48 @@
 document.addEventListener("DOMContentLoaded", function() {
     const placeholder = document.getElementById('nav-placeholder');
     
+    // Gebruik ALTIJD de slash vooraan voor root-relative paden
     fetch('/navbar.html')
-        .then(response => {
-            if (!response.ok) throw new Error('Navbar niet gevonden');
-            return response.text();
-        })
+        .then(response => response.text())
         .then(data => {
             placeholder.innerHTML = data;
 
-            // 1. Markeer als geladen voor de CSS animatie
+            // Fade-in effect voor de looks
             setTimeout(() => {
                 placeholder.classList.add('loaded');
             }, 50);
 
-            // --- DE FIX VOOR DE DROPDOWN/HAMBURGER ---
-            // We zoeken alle elementen die Bootstrap moet aansturen en initialiseren ze handmatig
+            // --- DE MANUELE KLIK-FIX ---
+            // We zoeken de knop en het menu IN de placeholder
             const toggler = placeholder.querySelector('.navbar-toggler');
-            if (toggler && window.bootstrap) {
-                new bootstrap.Collapse(document.getElementById('navbarNav'), {
-                    toggle: false
+            const menu = placeholder.querySelector('#navbarNav');
+
+            if (toggler && menu) {
+                toggler.addEventListener('click', function() {
+                    // We checken of het menu al open is
+                    const isOpen = menu.classList.contains('show');
+                    
+                    if (isOpen) {
+                        menu.classList.remove('show');
+                        this.classList.add('collapsed');
+                        this.setAttribute('aria-expanded', 'false');
+                    } else {
+                        menu.classList.add('show');
+                        this.classList.remove('collapsed');
+                        this.setAttribute('aria-expanded', 'true');
+                    }
                 });
             }
 
-            // 2. Active link logica
+            // Active link logica
             const currentPath = window.location.pathname;
-            const navLinks = document.querySelectorAll('.nav-link');
+            const navLinks = placeholder.querySelectorAll('.nav-link');
             navLinks.forEach(link => {
                 const linkHref = link.getAttribute('href');
-                if (currentPath === linkHref || 
-                    (currentPath === "/" && linkHref === "/index.html") ||
-                    (currentPath.endsWith('/') && linkHref.endsWith('index.html'))) {
+                if (currentPath === linkHref || (currentPath === "/" && linkHref === "/index.html")) {
                     link.classList.add('active');
                 }
             });
         })
-        .catch(err => console.error('Fout bij laden navbar:', err));
+        .catch(err => console.error('Navbar kon niet laden:', err));
 });
