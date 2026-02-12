@@ -17,14 +17,6 @@ main {
     padding-bottom: 20px;
 }
 
-header {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    background-color: #222c34;
-    color: white;
-    padding: 1rem;
-}
 
 header img {
     height: 40px;
@@ -62,6 +54,35 @@ nav {
 
 .navbar-toggler-icon {
     filter: invert(1);
+}
+/* We stylen de tag en het ID tegelijk om conflicten te voorkomen */
+header#nav-placeholder {
+    display: block !important;
+    height: 82px !important;       /* We dwingen de hoogte af */
+    background-color: #222c34 !important; /* We dwingen de kleur af */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 0 !important;         /* Geen padding totdat de nav er is! */
+    margin: 0;
+    overflow: hidden;
+}
+
+/* Zodra de navbar geladen is, fadet de inhoud in */
+#nav-placeholder nav {
+    opacity: 0;
+    transition: opacity 0.3s ease-in;
+}
+
+#nav-placeholder.loaded nav {
+    opacity: 1;
+}
+
+/* Mobiele fix: mocht de bar daar lager zijn */
+@media (max-width: 767px) {
+    header#nav-placeholder {
+        height: 72px !important; 
+    }
 }
 
 a {
@@ -178,18 +199,6 @@ legend {
     color: #000;
     margin-bottom: 0;
 }
-/* 1. De Placeholder: De zwarte balk staat direct klaar */
-#nav-placeholder {
-    height: 82px;              /* Exacte hoogte om de 'jump' te stoppen */
-    background-color: #222c34; /* Direct de juiste kleur */
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    display: block;
-    width: 100%;
-    overflow: hidden;          /* Voorkomt dat inhoud eruit lekt tijdens laden */
-}
-
 /* 2. De inhoud die erin komt (de nav) fadet in */
 #nav-placeholder nav {
     opacity: 0;
@@ -224,5 +233,6 @@ nav .nav-link.active {
     color: #00bcf2 !important;  /* Forceer de lichtblauwe kleur */
     opacity: 1 !important;      /* Zorgt dat hij niet doorzichtig/grijs is */
 }
+
 
 
