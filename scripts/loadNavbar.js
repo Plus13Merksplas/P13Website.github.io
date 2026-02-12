@@ -1,28 +1,33 @@
 document.addEventListener("DOMContentLoaded", function() {
     const placeholder = document.getElementById('nav-placeholder');
     
-    // 1. Haal de navbar op vanaf de root
     fetch('/navbar.html')
         .then(response => {
             if (!response.ok) throw new Error('Navbar niet gevonden');
             return response.text();
         })
         .then(data => {
-            // 2. Stop de HTML in de zwarte balk
             placeholder.innerHTML = data;
 
-            // 3. Activeer de fade-in van de links na een korte delay
+            // 1. Markeer als geladen voor de CSS animatie
             setTimeout(() => {
                 placeholder.classList.add('loaded');
             }, 50);
 
-            // 4. Zoek welke link 'active' moet zijn
+            // --- DE FIX VOOR DE DROPDOWN/HAMBURGER ---
+            // We zoeken alle elementen die Bootstrap moet aansturen en initialiseren ze handmatig
+            const toggler = placeholder.querySelector('.navbar-toggler');
+            if (toggler && window.bootstrap) {
+                new bootstrap.Collapse(document.getElementById('navbarNav'), {
+                    toggle: false
+                });
+            }
+
+            // 2. Active link logica
             const currentPath = window.location.pathname;
             const navLinks = document.querySelectorAll('.nav-link');
-
             navLinks.forEach(link => {
                 const linkHref = link.getAttribute('href');
-                // Check of de URL overeenkomt (ook voor de homepagina)
                 if (currentPath === linkHref || 
                     (currentPath === "/" && linkHref === "/index.html") ||
                     (currentPath.endsWith('/') && linkHref.endsWith('index.html'))) {
@@ -30,5 +35,5 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             });
         })
-        .catch(err => console.error('Fout:', err));
+        .catch(err => console.error('Fout bij laden navbar:', err));
 });
