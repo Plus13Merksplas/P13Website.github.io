@@ -1,35 +1,31 @@
 document.addEventListener("DOMContentLoaded", function() {
     const placeholder = document.getElementById('nav-placeholder');
     
-    // Gebruik ALTIJD de slash vooraan voor root-relative paden
     fetch('/navbar.html')
         .then(response => response.text())
         .then(data => {
             placeholder.innerHTML = data;
 
-            // Fade-in effect voor de looks
+            // 1. Navbar fade-in effect
             setTimeout(() => {
                 placeholder.classList.add('loaded');
             }, 50);
 
-            // --- DE MANUELE KLIK-FIX ---
-            // We zoeken de knop en het menu IN de placeholder
+            // 2. DE NIEUWE REGEL: Laat de hele pagina nu zachtjes verschijnen
+            document.body.classList.add('page-loaded');
+
+            // --- DE MANUELE KLIK-FIX (Die al werkte) ---
             const toggler = placeholder.querySelector('.navbar-toggler');
             const menu = placeholder.querySelector('#navbarNav');
-
             if (toggler && menu) {
                 toggler.addEventListener('click', function() {
-                    // We checken of het menu al open is
                     const isOpen = menu.classList.contains('show');
-                    
                     if (isOpen) {
                         menu.classList.remove('show');
                         this.classList.add('collapsed');
-                        this.setAttribute('aria-expanded', 'false');
                     } else {
                         menu.classList.add('show');
                         this.classList.remove('collapsed');
-                        this.setAttribute('aria-expanded', 'true');
                     }
                 });
             }
@@ -44,5 +40,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             });
         })
-        .catch(err => console.error('Navbar kon niet laden:', err));
+        .catch(err => {
+            console.error('Navbar kon niet laden:', err);
+            // Zorg dat de pagina ALTIJD verschijnt, ook bij een fout
+            document.body.classList.add('page-loaded');
+        });
 });
