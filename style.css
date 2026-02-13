@@ -1,63 +1,57 @@
-/* --- BASIS RESET --- */
+/* --- 1. BASIS RESET & BODY --- */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Laat de hele pagina standaard onzichtbaar starten voor de fade-in */
 body {
-    background-color: #add8e6;
+    background-color: #add8e6; /* Jouw lichtblauwe kleur */
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    opacity: 0; 
-    transition: opacity 0.5s ease-in-out;
+    /* De body zelf is direct zichtbaar voor de achtergrond, 
+       we faden de inhoud later in via de .page-loaded class */
 }
 
-/* Zodra we de class 'page-loaded' toevoegen via JS, wordt alles zichtbaar */
-body.page-loaded {
-    opacity: 1;
-}
-
-main {
-    flex: 1;
-    padding-top: 20px;
-    padding-bottom: 20px;
-}
-
-/* --- DE NAV-PLACEHOLDER --- */
+/* --- 2. DE NAV-PLACEHOLDER (VOORKOMT HET SPRINGEN) --- */
 header#nav-placeholder {
     display: block !important;
-    min-height: 82px !important;  /* Reserveert de ruimte */
-    height: auto !important;      /* Laat de bar meegroeien op gsm */
-    background-color: #222c34 !important;
+    min-height: 82px !important;  /* Houdt de ruimte bezet op desktop */
+    height: auto !important;      /* Laat de bar meegroeien op gsm voor het menu */
+    background-color: #222c34 !important; /* De kleur staat er direct */
     position: sticky;
     top: 0;
     z-index: 1000;
     padding: 0 !important;
     margin: 0 !important;
-    overflow: visible !important; /* CRUCIAAL: Menu moet uit de bar kunnen vallen */
+    overflow: visible !important; /* Menu moet uit de bar kunnen vallen op gsm */
 }
 
-/* De inhoud (nav) fadet pas in als het script klaar is */
-#nav-placeholder nav {
-    opacity: 0;
-    transition: opacity 0.3s ease-in;
-}
-
-#nav-placeholder.loaded nav {
-    opacity: 1;
-}
-
-/* Mobiele fix voor de hoogte */
+/* Mobiele fix voor de bar-hoogte */
 @media (max-width: 767px) {
     header#nav-placeholder {
         min-height: 72px !important;
     }
 }
 
-/* --- NAVBAR STYLING --- */
+/* --- 3. HET FADE-IN EFFECT --- */
+/* We verbergen de inhoud standaard voor een rustige start */
+main, 
+footer, 
+#nav-placeholder nav {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+/* Zodra de navbar geladen is, komt alles tevoorschijn */
+body.page-loaded main,
+body.page-loaded footer,
+body.page-loaded #nav-placeholder nav {
+    opacity: 1;
+}
+
+/* --- 4. NAVBAR STYLING --- */
 nav {
     background-color: #222c34;
 }
@@ -86,7 +80,7 @@ header img {
     text-decoration: underline;
 }
 
-/* De actieve link in het menu */
+/* De blauwe kleur van het logo voor de actieve pagina */
 nav .nav-link.active {
     color: #00bcf2 !important;
     font-weight: bold;
@@ -95,10 +89,16 @@ nav .nav-link.active {
 }
 
 .navbar-toggler-icon {
-    filter: invert(1);
+    filter: invert(1); /* Zorgt voor een wit icoontje op zwart */
 }
 
-/* --- ALGEMENE ELEMENTEN --- */
+/* --- 5. LAYOUT & BLOKKEN --- */
+main {
+    flex: 1;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
 a {
     text-decoration: none;
     color: white;
@@ -108,11 +108,6 @@ img {
     border-radius: 10px;
 }
 
-iframe {
-    width: 100%;
-}
-
-/* --- BLOKKEN & LAYOUT --- */
 .text-box, .foto-box, .bgl-box, .contact-box {
     background-color: white;
     border-radius: 10px;
@@ -125,7 +120,11 @@ iframe {
     color: blue;
 }
 
-/* --- BUTTONS --- */
+iframe {
+    width: 100%;
+}
+
+/* --- 6. BUTTONS --- */
 .btn {
     width: 100%;
 }
@@ -144,33 +143,53 @@ iframe {
     border-color: #005f6b;
 }
 
-/* --- FORMULIEREN --- */
+/* De speciale downloadknoppen voor de docs */
+.btn-custom-download {
+    background-color: #00008B;
+    border-color: #00008B;
+    color: white !important;
+    height: 60px;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+}
+
+.btn-custom-download:hover {
+    background-color: #0033cc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
+}
+
+/* --- 7. FORMULIEREN & INPUTS --- */
 .form-label {
     font-weight: bold;
     color: #333;
 }
 
-.form-control, .form-select {
+.form-control,
+.form-select {
     border-radius: 0.5rem;
     border: 1px solid #ced4da;
     padding: 0.75rem 1rem;
 }
 
-.form-control:focus, .form-select:focus {
+.form-control:focus,
+.form-select:focus {
     border-color: #add8e6;
     box-shadow: 0 0 0 0.25rem rgba(173, 216, 230, 0.25);
     outline: none;
 }
 
-#responseMessage {
-    padding: 1rem;
-    border-radius: 0.5rem;
-    font-weight: bold;
-    text-align: center;
+.form-check-input {
+    margin-top: 0.3rem;
 }
 
-.alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-.alert-danger { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+.form-check-label {
+    margin-left: 0.5rem;
+}
 
 fieldset {
     border: 1px solid #dee2e6;
@@ -188,7 +207,27 @@ legend {
     margin-bottom: 0;
 }
 
-/* --- FOOTER --- */
+/* --- 8. FEEDBACK MELDINGEN --- */
+#responseMessage {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* --- 9. FOOTER --- */
 footer {
     background-color: #222c34;
     color: white;
@@ -202,6 +241,7 @@ footer {
     margin-left: 15px;
 }
 
+/* --- 10. OVERIGE --- */
 .notFound a {
     color: blue;
     text-decoration: underline;
@@ -209,26 +249,4 @@ footer {
 
 .notFound a:hover {
     color: black;
-}
-
-/* --- DOWNLOAD KNOPPEN --- */
-.btn-custom-download {
-    background-color: #00008B;
-    border-color: #00008B;
-    color: white !important;
-    height: 60px;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.5rem;
-}
-
-.btn-custom-download:hover {
-    background-color: #0033cc;
-    border-color: #0033cc;
-    color: white !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
 }
