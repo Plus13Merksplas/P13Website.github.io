@@ -5,22 +5,39 @@
     box-sizing: border-box;
 }
 
+/* Laat de hele pagina standaard onzichtbaar starten voor de fade-in */
+body {
+    background-color: #add8e6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    opacity: 0; 
+    transition: opacity 0.5s ease-in-out;
+}
+
+/* Zodra we de class 'page-loaded' toevoegen via JS, wordt alles zichtbaar */
+body.page-loaded {
+    opacity: 1;
+}
+
 main {
     flex: 1;
     padding-top: 20px;
     padding-bottom: 20px;
 }
 
-/* --- DE NAV-PLACEHOLDER (DIT STOPT HET SPRINGEN) --- */
+/* --- DE NAV-PLACEHOLDER --- */
 header#nav-placeholder {
     display: block !important;
     min-height: 82px !important;  /* Reserveert de ruimte */
-    background-color: #222c34 !important; /* De kleur staat er direct */
+    height: auto !important;      /* Laat de bar meegroeien op gsm */
+    background-color: #222c34 !important;
     position: sticky;
     top: 0;
     z-index: 1000;
     padding: 0 !important;
     margin: 0 !important;
+    overflow: visible !important; /* CRUCIAAL: Menu moet uit de bar kunnen vallen */
 }
 
 /* De inhoud (nav) fadet pas in als het script klaar is */
@@ -193,11 +210,12 @@ footer {
 .notFound a:hover {
     color: black;
 }
-/* --- DOWNLOAD KNOPPEN (Weekend Docs) --- */
+
+/* --- DOWNLOAD KNOPPEN --- */
 .btn-custom-download {
-    background-color: #00008B; /* Donkerblauw */
+    background-color: #00008B;
     border-color: #00008B;
-    color: white !important;   /* Forceer wit, ook als het een link is */
+    color: white !important;
     height: 60px;
     font-size: 1.1rem;
     transition: all 0.3s ease;
@@ -211,24 +229,6 @@ footer {
     background-color: #0033cc;
     border-color: #0033cc;
     color: white !important;
-    transform: translateY(-2px); /* Het zweef-effect */
+    transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
-}
-
-.btn-custom-download i {
-    font-size: 1.4rem; /* Maak het PDF icoontje net iets groter */
-}
-/* Laat de hele pagina standaard onzichtbaar starten */
-body {
-    background-color: #add8e6;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    opacity: 0; /* <--- Dit is de magische regel */
-    transition: opacity 0.5s ease-in-out; /* Dit zorgt voor de zachte overgang */
-}
-
-/* Zodra we de class 'page-loaded' toevoegen, wordt alles zichtbaar */
-body.page-loaded {
-    opacity: 1;
 }
