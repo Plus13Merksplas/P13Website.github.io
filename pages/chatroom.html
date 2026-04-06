@@ -55,7 +55,7 @@
     <div id="chatbox"></div>
 
     <div>
-        <input type="text" id="bericht-input" placeholder="Voer bericht in..." autocomplete="off">
+        <input type="text" id="bericht-input" placeholder="Voer commando in..." autocomplete="off">
         <button id="verzenden-btn">Verzenden</button>
     </div>
 
@@ -64,13 +64,12 @@
         const savedUsername = localStorage.getItem("username");
         const savedRole = localStorage.getItem("role");
 
-        // Als er geen naam en geen admin is, schop ze terug naar index.html
         if (!savedUsername && savedRole !== "admin") {
             window.location.href = "index.html";
         }
 
-        // Bepaal de weergavenaam voor in de database en op het scherm
-        const displayName = savedRole === "admin" ? "Admin" : savedUsername;
+        // Admins heten nu 'SYSTEEM' in de chat
+        const displayName = savedRole === "admin" ? "SYSTEEM" : savedUsername;
         document.getElementById('login-status').innerText = "INGELOGD ALS: " + displayName.toUpperCase();
 
         // --- 2. FIREBASE SETUP ---
@@ -105,12 +104,12 @@
             });
         }
 
-        // --- BERICHTEN VERSTUREN EN ONTVANGEN ---
+        // --- BERICHTEN VERSTUREN ---
         function verstuurBericht() {
             const tekst = inputVeld.value.trim();
             if (tekst !== "") {
                 push(berichtenRef, {
-                    afzender: displayName, // Hier gaat de naam uit de pop-up de database in!
+                    afzender: displayName, 
                     inhoud: tekst
                 });
                 inputVeld.value = ""; 
@@ -122,21 +121,29 @@
             if (e.key === 'Enter') verstuurBericht();
         });
 
-        // Luister naar berichten via Firebase
+        // --- BERICHTEN ONTVANGEN & STYLEN ---
         onChildAdded(berichtenRef, (snapshot) => {
             const berichtData = snapshot.val();
             const berichtDiv = document.createElement('div');
             
-            if (berichtData.afzender === displayName) {
-                // Wat je ZELF typt: blijft onversleuteld en wit
+            if (berichtData.afzender === "SYSTEEM") {
+                // Systeemberichten: KEIHARD ROOD, VETGEDRUKT en ONVERSLEUTELD
+                berichtDiv.innerHTML = `<strong>${berichtData.afzender}: ${berichtData.inhoud}</strong>`;
+                berichtDiv.style.color = "#ff3333";
+            } else if (berichtData.afzender === displayName) {
+                // Wat je ZELF typt: normaal groen en onversleuteld
                 berichtDiv.innerHTML = `<strong>${berichtData.afzender}:</strong> ${berichtData.inhoud}`;
-                berichtDiv.style.color = "#ffffff";
+                berichtDiv.style.color = "#00ff00";
             } else {
-                // Wat de ANDER typt: wordt versleuteld met de Caesar Cipher en rood
+                // Wat een ANDERE normale speler typt: normaal groen en VERSLEUTELD
                 const versleuteldeTekst = versleutel(berichtData.inhoud, caesarVerschuiving);
-                berichtDiv.innerHTML = `<strong style="color: #ff3333;">${berichtData.afzender}:</strong> ${versleuteldeTekst}`;
+                berichtDiv.innerHTML = `<strong>${berichtData.afzender}:</strong> ${versleuteldeTekst}`;
+                berichtDiv.style.color = "#00ff00";
             }
             
+            // Zet een beetje marge tussen de berichten voor de leesbaarheid
+            berichtDiv.style.marginBottom = "5px";
+
             chatbox.appendChild(berichtDiv);
             chatbox.scrollTop = chatbox.scrollHeight;
         });
