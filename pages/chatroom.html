@@ -55,7 +55,7 @@
     <div id="chatbox"></div>
 
     <div>
-        <input type="text" id="bericht-input" placeholder="Voer commando in..." autocomplete="off">
+        <input type="text" id="bericht-input" placeholder="Voer commando in (GEEN CIJFERS)..." autocomplete="off">
         <button id="verzenden-btn">Verzenden</button>
     </div>
 
@@ -88,6 +88,19 @@
         const inputVeld = document.getElementById('bericht-input');
         const verzendKnop = document.getElementById('verzenden-btn');
 
+        // --- CIJFER-BLOKKADE LOGICA ---
+        // Blokkeer het typen van cijfers 0 t/m 9
+        inputVeld.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9') {
+                e.preventDefault();
+            }
+        });
+
+        // Filter cijfers eruit als ze geplakt worden
+        inputVeld.addEventListener('input', () => {
+            inputVeld.value = inputVeld.value.replace(/[0-9]/g, '');
+        });
+
         // --- CAESAR CIPHER ---
         const caesarVerschuiving = 5; 
 
@@ -118,26 +131,21 @@
             const berichtData = snapshot.val();
             const berichtDiv = document.createElement('div');
             
-            // Check of de AFZENDER van het bericht 'Systeem' is
             const afzenderIsSysteem = berichtData.afzender.toLowerCase() === "systeem";
 
             if (afzenderIsSysteem) {
-                // ALLES van 'Systeem' wordt voor IEDEREEN rood, vet en leesbaar
                 berichtDiv.innerHTML = `<strong>${berichtData.afzender.toUpperCase()}: ${berichtData.inhoud}</strong>`;
                 berichtDiv.style.color = "#ff3333";
             } 
             else if (isSysteemUser) {
-                // JIJ bent het systeem: jij ziet ALLES van anderen onversleuteld (groen)
                 berichtDiv.innerHTML = `<strong>${berichtData.afzender}:</strong> ${berichtData.inhoud}`;
                 berichtDiv.style.color = "#00ff00";
             }
             else if (berichtData.afzender === savedUsername) {
-                // Speler ziet eigen bericht: groen en leesbaar
                 berichtDiv.innerHTML = `<strong>${berichtData.afzender}:</strong> ${berichtData.inhoud}`;
                 berichtDiv.style.color = "#00ff00";
             } 
             else {
-                // Speler ziet bericht van andere speler: groen en VERSLEUTELD
                 const versleuteldeTekst = versleutel(berichtData.inhoud, caesarVerschuiving);
                 berichtDiv.innerHTML = `<strong>${berichtData.afzender}:</strong> ${versleuteldeTekst}`;
                 berichtDiv.style.color = "#00ff00";
