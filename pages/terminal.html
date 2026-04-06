@@ -3,15 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jouw Website</title>
+    <title>Toegang</title>
+    
+    <style>
+        :root { color-scheme: light dark; }
+        body {
+            font-family: system-ui, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        @media (prefers-color-scheme: dark) {
+            body { background-color: #121212; color: #fff; }
+        }
+    </style>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            const chatroomURL = "chatroom.html";
+
             const urlParams = new URLSearchParams(window.location.search);
             const isSecretAdminLink = urlParams.get('admin') === '1';
 
             if (isSecretAdminLink) {
                 localStorage.setItem("role", "admin");
                 window.history.replaceState({}, document.title, window.location.pathname);
+                window.location.href = chatroomURL; 
                 return; 
             }
 
@@ -19,17 +41,20 @@
             const savedRole = localStorage.getItem("role");
 
             if (!savedUsername && savedRole !== "admin") {
-                let newUsername = prompt("Username?");
+                let newUsername = prompt("Wat is je gebruikersnaam?");
                 if (newUsername && newUsername.trim() !== "") {
                     localStorage.setItem("username", newUsername.trim());
+                    window.location.href = chatroomURL; 
+                } else {
+                    document.body.innerHTML = "<h1>Je moet een naam invullen om door te gaan. Ververs de pagina.</h1>";
                 }
+            } else {
+                window.location.href = chatroomURL; 
             }
         });
     </script>
 </head>
 <body>
-    <header>
-        <h1>Welkom op de besloten website</h1>
-    </header>
+    <h1>Laden...</h1>
 </body>
 </html>
