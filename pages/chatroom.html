@@ -60,17 +60,11 @@
     </div>
 
     <script type="module">
-        // --- 1. BEVEILIGING EN USERNAME CHECK ---
-        const savedUsername = localStorage.getItem("username");
-        const savedRole = localStorage.getItem("role");
-
-        if (!savedUsername && savedRole !== "admin") {
-            window.location.href = "index.html";
-        }
-
-        // Admins heten nu 'SYSTEEM' in de chat
-        const displayName = savedRole === "admin" ? "SYSTEEM" : savedUsername;
-        document.getElementById('login-status').innerText = "INGELOGD ALS: " + displayName.toUpperCase();
+        // --- 1. GEBRUIKERSNAAM OPHALEN ---
+        const savedUsername = localStorage.getItem("username") || "Onbekend";
+        
+        // Laat de gebruiker in de terminal zien onder welke naam ze sturen
+        document.getElementById('login-status').innerText = "TERMINAL SESSIE: " + savedUsername.toUpperCase();
 
         // --- 2. FIREBASE SETUP ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
@@ -94,7 +88,7 @@
         const inputVeld = document.getElementById('bericht-input');
         const verzendKnop = document.getElementById('verzenden-btn');
 
-        // --- CAESAR CIPHER FUNCTIE ---
+        // --- CAESAR CIPHER ---
         const caesarVerschuiving = 3; 
 
         function versleutel(tekst, verschuiving) {
@@ -109,7 +103,7 @@
             const tekst = inputVeld.value.trim();
             if (tekst !== "") {
                 push(berichtenRef, {
-                    afzender: displayName, 
+                    afzender: savedUsername, 
                     inhoud: tekst
                 });
                 inputVeld.value = ""; 
@@ -117,33 +111,32 @@
         }
 
         verzendKnop.addEventListener('click', verstuurBericht);
-        inputVeld.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') verstuurBericht();
-        });
+        inputVeld.addEventListener('keypress', (e) => { if (e.key === 'Enter') verstuurBericht(); });
 
-        // --- BERICHTEN ONTVANGEN & STYLEN ---
+        // --- BERICHTEN ONTVANGEN & CONTROLEREN OP "SYSTEEM" ---
         onChildAdded(berichtenRef, (snapshot) => {
             const berichtData = snapshot.val();
             const berichtDiv = document.createElement('div');
             
-            if (berichtData.afzender === "SYSTEEM") {
-                // Systeemberichten: KEIHARD ROOD, VETGEDRUKT en ONVERSLEUTELD
-                berichtDiv.innerHTML = `<strong>${berichtData.afzender}: ${berichtData.inhoud}</strong>`;
+            // We maken de check ongevoelig voor hoofdletters (dus 'systeem', 'Systeem' en 'SYSTEEM' werken allemaal)
+            const isSysteem = berichtData.afzender.toLowerCase() === "systeem";
+
+            if (isSysteem) {
+                // ALLES van de afzender 'Systeem' wordt ROOD, VET en ONVERSLEUTELD
+                berichtDiv.innerHTML = `<strong>${berichtData.afzender.toUpperCase()}: ${berichtData.inhoud}</strong>`;
                 berichtDiv.style.color = "#ff3333";
-            } else if (berichtData.afzender === displayName) {
-                // Wat je ZELF typt: normaal groen en onversleuteld
+            } else if (berichtData.afzender === savedUsername) {
+                // Jouw eigen berichten: GROEN en ONVERSLEUTELD
                 berichtDiv.innerHTML = `<strong>${berichtData.afzender}:</strong> ${berichtData.inhoud}`;
                 berichtDiv.style.color = "#00ff00";
             } else {
-                // Wat een ANDERE normale speler typt: normaal groen en VERSLEUTELD
+                // Berichten van anderen: GROEN en VERSLEUTELD
                 const versleuteldeTekst = versleutel(berichtData.inhoud, caesarVerschuiving);
                 berichtDiv.innerHTML = `<strong>${berichtData.afzender}:</strong> ${versleuteldeTekst}`;
                 berichtDiv.style.color = "#00ff00";
             }
             
-            // Zet een beetje marge tussen de berichten voor de leesbaarheid
             berichtDiv.style.marginBottom = "5px";
-
             chatbox.appendChild(berichtDiv);
             chatbox.scrollTop = chatbox.scrollHeight;
         });
