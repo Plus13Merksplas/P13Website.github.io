@@ -62,8 +62,8 @@
     <script type="module">
         // --- 1. GEBRUIKERSNAAM OPHALEN ---
         const savedUsername = localStorage.getItem("username") || "Onbekend";
+        const isSysteemUser = savedUsername.toLowerCase() === "systeem";
         
-        // Laat de gebruiker in de terminal zien onder welke naam ze sturen
         document.getElementById('login-status').innerText = "TERMINAL SESSIE: " + savedUsername.toUpperCase();
 
         // --- 2. FIREBASE SETUP ---
@@ -113,24 +113,31 @@
         verzendKnop.addEventListener('click', verstuurBericht);
         inputVeld.addEventListener('keypress', (e) => { if (e.key === 'Enter') verstuurBericht(); });
 
-        // --- BERICHTEN ONTVANGEN & CONTROLEREN OP "SYSTEEM" ---
+        // --- BERICHTEN ONTVANGEN ---
         onChildAdded(berichtenRef, (snapshot) => {
             const berichtData = snapshot.val();
             const berichtDiv = document.createElement('div');
             
-            // We maken de check ongevoelig voor hoofdletters (dus 'systeem', 'Systeem' en 'SYSTEEM' werken allemaal)
-            const isSysteem = berichtData.afzender.toLowerCase() === "systeem";
+            // Check of de AFZENDER van het bericht 'Systeem' is
+            const afzenderIsSysteem = berichtData.afzender.toLowerCase() === "systeem";
 
-            if (isSysteem) {
-                // ALLES van de afzender 'Systeem' wordt ROOD, VET en ONVERSLEUTELD
+            if (afzenderIsSysteem) {
+                // ALLES van 'Systeem' wordt voor IEDEREEN rood, vet en leesbaar
                 berichtDiv.innerHTML = `<strong>${berichtData.afzender.toUpperCase()}: ${berichtData.inhoud}</strong>`;
                 berichtDiv.style.color = "#ff3333";
-            } else if (berichtData.afzender === savedUsername) {
-                // Jouw eigen berichten: GROEN en ONVERSLEUTELD
+            } 
+            else if (isSysteemUser) {
+                // JIJ bent het systeem: jij ziet ALLES van anderen onversleuteld (groen)
                 berichtDiv.innerHTML = `<strong>${berichtData.afzender}:</strong> ${berichtData.inhoud}`;
                 berichtDiv.style.color = "#00ff00";
-            } else {
-                // Berichten van anderen: GROEN en VERSLEUTELD
+            }
+            else if (berichtData.afzender === savedUsername) {
+                // Speler ziet eigen bericht: groen en leesbaar
+                berichtDiv.innerHTML = `<strong>${berichtData.afzender}:</strong> ${berichtData.inhoud}`;
+                berichtDiv.style.color = "#00ff00";
+            } 
+            else {
+                // Speler ziet bericht van andere speler: groen en VERSLEUTELD
                 const versleuteldeTekst = versleutel(berichtData.inhoud, caesarVerschuiving);
                 berichtDiv.innerHTML = `<strong>${berichtData.afzender}:</strong> ${versleuteldeTekst}`;
                 berichtDiv.style.color = "#00ff00";
