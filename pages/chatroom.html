@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>De Chatroom</title>
+    
+    <style>
+        :root { color-scheme: light dark; }
+        body {
+            font-family: system-ui, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        @media (prefers-color-scheme: dark) {
+            body { background-color: #121212; color: #fff; }
+            .bericht-balk { background-color: #1e1e1e !important; border-top: 1px solid #333 !important; }
+            input { background-color: #333; color: white; border: 1px solid #555 !important; }
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+        #chatVenster {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .bericht {
+            background: rgba(128, 128, 128, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            width: fit-content;
+            max-width: 80%;
+        }
+        .bericht-balk {
+            display: flex;
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #ddd;
+        }
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+
+    <header id="welcomeText">Bezig met laden...</header>
+
+    <div id="chatVenster">
+        </div>
+
+    <div class="bericht-balk">
+        <input type="text" id="berichtInput" placeholder="Typ een bericht..." autocomplete="off">
+        <button id="stuurBtn">Stuur</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. Haal de badge uit de "broekzak"
+            const myName = localStorage.getItem("username");
+            const myRole = localStorage.getItem("role");
+
+            // 2. Beveiliging: Geen naam én geen admin? Terug naar de poort!
+            if (!myName && myRole !== "admin") {
+                window.location.href = "index.html";
+                return;
+            }
+
+            // 3. Bepaal de weergavenaam
+            const displayName = myRole === "admin" ? "Admin" : myName;
+            
+            // 4. Update de header zodat je ziet wie je bent
+            document.getElementById("welcomeText").innerText = "Chatroom - Ingelogd als: " + displayName;
+
+            // --- HIERONDER ZIT DE LOGICA OM EEN BERICHT TE PLAATSEN ---
+            const stuurKnop = document.getElementById("stuurBtn");
+            const berichtVeld = document.getElementById("berichtInput");
+            const chatVenster = document.getElementById("chatVenster");
+
+            function stuurBericht() {
+                const tekst = berichtVeld.value.trim();
+                
+                if (tekst !== "") {
+                    // Maak het bericht op met de opgeslagen naam erbij
+                    const nieuwBericht = document.createElement("div");
+                    nieuwBericht.className = "bericht";
+                    nieuwBericht.innerHTML = "<strong>" + displayName + ":</strong> " + tekst;
+                    
+                    // Zet het in het scherm
+                    chatVenster.appendChild(nieuwBericht);
+
+                    // Maak het invoerveld leeg en scroll naar beneden
+                    berichtVeld.value = "";
+                    chatVenster.scrollTop = chatVenster.scrollHeight;
+                }
+            }
+
+            // Stuur via de knop
+            stuurKnop.addEventListener("click", stuurBericht);
+
+            // Stuur via de 'Enter' toets
+            berichtVeld.addEventListener("keypress", function(e) {
+                if (e.key === "Enter") {
+                    stuurBericht();
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
