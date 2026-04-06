@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jouw Website</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isSecretAdminLink = urlParams.get('admin') === '1';
+
+            if (isSecretAdminLink) {
+                localStorage.setItem("role", "admin");
+                window.history.replaceState({}, document.title, window.location.pathname);
+                return; 
+            }
+
+            const savedUsername = localStorage.getItem("username");
+            const savedRole = localStorage.getItem("role");
+
+            if (!savedUsername && savedRole !== "admin") {
+                let newUsername = prompt("Username?");
+                if (newUsername && newUsername.trim() !== "") {
+                    localStorage.setItem("username", newUsername.trim());
+                }
+            }
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Welkom op de besloten website</h1>
+    </header>
+</body>
+</html>
