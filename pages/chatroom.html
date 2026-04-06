@@ -2,136 +2,143 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>De Chatroom</title>
-    
+    <title>Escape Room Terminal</title>
     <style>
-        :root { color-scheme: light dark; }
         body {
-            font-family: system-ui, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            background-color: #f4f4f9;
-            color: #333;
-        }
-        @media (prefers-color-scheme: dark) {
-            body { background-color: #121212; color: #fff; }
-            .bericht-balk { background-color: #1e1e1e !important; border-top: 1px solid #333 !important; }
-            input { background-color: #333; color: white; border: 1px solid #555 !important; }
-        }
-        header {
-            background-color: #007bff;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-weight: bold;
-        }
-        #chatVenster {
-            flex-grow: 1;
+            font-family: monospace;
+            background-color: #000000;
+            color: #00ff00;
             padding: 20px;
+        }
+        
+        #chatbox {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #00ff00;
             overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .bericht {
-            background: rgba(128, 128, 128, 0.1);
-            padding: 10px 15px;
-            border-radius: 8px;
-            width: fit-content;
-            max-width: 80%;
-        }
-        .bericht-balk {
-            display: flex;
-            padding: 15px;
-            background-color: white;
-            border-top: 1px solid #ddd;
-        }
-        input[type="text"] {
-            flex-grow: 1;
+            margin-bottom: 15px;
             padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            margin-right: 10px;
+            box-sizing: border-box;
+            background-color: #111111;
+        }
+
+        #bericht-input {
+            width: 70%;
+            padding: 10px;
+            background-color: #000000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: monospace;
             font-size: 16px;
         }
-        button {
+
+        #verzenden-btn {
             padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
+            background-color: #00ff00;
+            color: #000000;
             border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            font-weight: bold;
+            font-family: monospace;
             font-size: 16px;
+            cursor: pointer;
         }
-        button:hover { background-color: #0056b3; }
+
+        #verzenden-btn:hover {
+            background-color: #ffffff;
+        }
     </style>
 </head>
 <body>
 
-    <header id="welcomeText">Bezig met laden...</header>
+    <div id="login-status" style="margin-bottom: 15px; font-weight: bold;"></div>
 
-    <div id="chatVenster">
-        </div>
+    <div id="chatbox"></div>
 
-    <div class="bericht-balk">
-        <input type="text" id="berichtInput" placeholder="Typ een bericht..." autocomplete="off">
-        <button id="stuurBtn">Stuur</button>
+    <div>
+        <input type="text" id="bericht-input" placeholder="Voer bericht in..." autocomplete="off">
+        <button id="verzenden-btn">Verzenden</button>
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // 1. Haal de badge uit de "broekzak"
-            const myName = localStorage.getItem("username");
-            const myRole = localStorage.getItem("role");
+    <script type="module">
+        // --- 1. BEVEILIGING EN USERNAME CHECK ---
+        const savedUsername = localStorage.getItem("username");
+        const savedRole = localStorage.getItem("role");
 
-            // 2. Beveiliging: Geen naam én geen admin? Terug naar de poort!
-            if (!myName && myRole !== "admin") {
-                window.location.href = "index.html";
-                return;
-            }
+        // Als er geen naam en geen admin is, schop ze terug naar index.html
+        if (!savedUsername && savedRole !== "admin") {
+            window.location.href = "index.html";
+        }
 
-            // 3. Bepaal de weergavenaam
-            const displayName = myRole === "admin" ? "Admin" : myName;
-            
-            // 4. Update de header zodat je ziet wie je bent
-            document.getElementById("welcomeText").innerText = "Chatroom - Ingelogd als: " + displayName;
+        // Bepaal de weergavenaam voor in de database en op het scherm
+        const displayName = savedRole === "admin" ? "Admin" : savedUsername;
+        document.getElementById('login-status').innerText = "INGELOGD ALS: " + displayName.toUpperCase();
 
-            // --- HIERONDER ZIT DE LOGICA OM EEN BERICHT TE PLAATSEN ---
-            const stuurKnop = document.getElementById("stuurBtn");
-            const berichtVeld = document.getElementById("berichtInput");
-            const chatVenster = document.getElementById("chatVenster");
+        // --- 2. FIREBASE SETUP ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+        import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-database.js";
 
-            function stuurBericht() {
-                const tekst = berichtVeld.value.trim();
-                
-                if (tekst !== "") {
-                    // Maak het bericht op met de opgeslagen naam erbij
-                    const nieuwBericht = document.createElement("div");
-                    nieuwBericht.className = "bericht";
-                    nieuwBericht.innerHTML = "<strong>" + displayName + ":</strong> " + tekst;
-                    
-                    // Zet het in het scherm
-                    chatVenster.appendChild(nieuwBericht);
+        const firebaseConfig = {
+            apiKey: "AIzaSyCj_i-KUABcpzNdLdgQiexILUOJRkOt94Y",
+            authDomain: "escape-room-plussertjes.firebaseapp.com",
+            databaseURL: "https://escape-room-plussertjes-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "escape-room-plussertjes",
+            storageBucket: "escape-room-plussertjes.firebasestorage.app",
+            messagingSenderId: "881613293314",
+            appId: "1:881613293314:web:30861cf618d25f835a241b"
+        };
 
-                    // Maak het invoerveld leeg en scroll naar beneden
-                    berichtVeld.value = "";
-                    chatVenster.scrollTop = chatVenster.scrollHeight;
-                }
-            }
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const berichtenRef = ref(db, 'berichten');
 
-            // Stuur via de knop
-            stuurKnop.addEventListener("click", stuurBericht);
+        const chatbox = document.getElementById('chatbox');
+        const inputVeld = document.getElementById('bericht-input');
+        const verzendKnop = document.getElementById('verzenden-btn');
 
-            // Stuur via de 'Enter' toets
-            berichtVeld.addEventListener("keypress", function(e) {
-                if (e.key === "Enter") {
-                    stuurBericht();
-                }
+        // --- CAESAR CIPHER FUNCTIE ---
+        const caesarVerschuiving = 3; 
+
+        function versleutel(tekst, verschuiving) {
+            return tekst.replace(/[a-zA-Z]/g, function(letter) {
+                const basis = letter <= 'Z' ? 65 : 97;
+                return String.fromCharCode(((letter.charCodeAt(0) - basis + verschuiving) % 26 + 26) % 26 + basis);
             });
+        }
+
+        // --- BERICHTEN VERSTUREN EN ONTVANGEN ---
+        function verstuurBericht() {
+            const tekst = inputVeld.value.trim();
+            if (tekst !== "") {
+                push(berichtenRef, {
+                    afzender: displayName, // Hier gaat de naam uit de pop-up de database in!
+                    inhoud: tekst
+                });
+                inputVeld.value = ""; 
+            }
+        }
+
+        verzendKnop.addEventListener('click', verstuurBericht);
+        inputVeld.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') verstuurBericht();
+        });
+
+        // Luister naar berichten via Firebase
+        onChildAdded(berichtenRef, (snapshot) => {
+            const berichtData = snapshot.val();
+            const berichtDiv = document.createElement('div');
+            
+            if (berichtData.afzender === displayName) {
+                // Wat je ZELF typt: blijft onversleuteld en wit
+                berichtDiv.innerHTML = `<strong>${berichtData.afzender}:</strong> ${berichtData.inhoud}`;
+                berichtDiv.style.color = "#ffffff";
+            } else {
+                // Wat de ANDER typt: wordt versleuteld met de Caesar Cipher en rood
+                const versleuteldeTekst = versleutel(berichtData.inhoud, caesarVerschuiving);
+                berichtDiv.innerHTML = `<strong style="color: #ff3333;">${berichtData.afzender}:</strong> ${versleuteldeTekst}`;
+            }
+            
+            chatbox.appendChild(berichtDiv);
+            chatbox.scrollTop = chatbox.scrollHeight;
         });
     </script>
 
