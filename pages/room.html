@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <title>Terminal Access Control</title>
+    <style>
+        body {
+            font-family: monospace;
+            background-color: #000000;
+            color: #00ff00;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        
+        .login-container {
+            border: 1px solid #00ff00;
+            padding: 30px;
+            background-color: #111111;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+            text-align: center;
+        }
+
+        h2 {
+            margin-top: 0;
+            letter-spacing: 2px;
+        }
+
+        #pw-input {
+            width: 100%;
+            padding: 10px;
+            margin: 20px 0;
+            background-color: #000000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: monospace;
+            font-size: 18px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        #pw-input:focus {
+            outline: none;
+            box-shadow: 0 0 5px #00ff00;
+        }
+
+        #login-btn {
+            padding: 10px 30px;
+            background-color: #00ff00;
+            color: #000000;
+            border: none;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        #login-btn:hover {
+            background-color: #ffffff;
+        }
+
+        .error-msg {
+            color: #ff3333;
+            margin-top: 15px;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>LOGIN: <span id="user-display">...</span></h2>
+        
+        <input type="password" id="pw-input" placeholder="VOER WACHTWOORD IN" autofocus>
+        
+        <button id="login-btn">ENTER TERMINAL</button>
+        
+        <div id="error" class="error-msg">TOEGANG GEWEIGERD: ONJUIST WACHTWOORD</div>
+    </div>
+
+    <script>
+        // --- PAS HIER JE WACHTWOORD AAN ---
+        const HET_WACHTWOORD = "test"; 
+        // ---------------------------------
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Haal de naam op uit de lokale cache
+            const savedUsername = localStorage.getItem("username") || "ONBEKEND";
+            document.getElementById("user-display").innerText = savedUsername.toUpperCase();
+
+            const inputField = document.getElementById("pw-input");
+            const loginBtn = document.getElementById("login-btn");
+            const errorDiv = document.getElementById("error");
+
+            function checkPassword() {
+                if (inputField.value === HET_WACHTWOORD) {
+                    // Correct? Doorsturen naar de chatroom
+                    window.location.href = "chatroom.html";
+                } else {
+                    // Fout? Laat de error zien en schud het veld eventueel (optioneel)
+                    errorDiv.style.display = "block";
+                    inputField.value = "";
+                    inputField.focus();
+                }
+            }
+
+            // Klik op de knop
+            loginBtn.addEventListener("click", checkPassword);
+
+            // Of druk op Enter in het tekstveld
+            inputField.addEventListener("keypress", function(e) {
+                if (e.key === "Enter") {
+                    checkPassword();
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
