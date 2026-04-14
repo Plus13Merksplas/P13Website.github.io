@@ -108,7 +108,7 @@ img {
     border-radius: 10px;
 }
 
-.text-box, .foto-box, .bgl-box,  {
+.text-box, .foto-box, .bgl-box  {
     background-color: white;
     border-radius: 10px;
     height: fit-content;
