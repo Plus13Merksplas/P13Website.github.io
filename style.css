@@ -115,7 +115,7 @@ img {
     width: 40%;
     text-align: center;
 }
-.contact-box{
+.contact-box,.info-box{
     background-color: white;
     border-radius: 10px;
     height: fit-content;
