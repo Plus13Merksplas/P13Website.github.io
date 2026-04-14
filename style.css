@@ -108,14 +108,20 @@ img {
     border-radius: 10px;
 }
 
-.text-box, .foto-box, .bgl-box, .contact-box {
+.text-box, .foto-box, .bgl-box,  {
     background-color: white;
     border-radius: 10px;
     height: fit-content;
-    width: 100%;
+    width: 40%;
     text-align: center;
 }
-
+.contact-box{
+    background-color: white;
+    border-radius: 10px;
+    height: fit-content;
+    text-align: center;
+    
+}
 .contact-box a {
     color: blue;
 }
