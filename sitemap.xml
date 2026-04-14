@@ -15,20 +15,15 @@
 <url>
   <loc>https://plus13merksplas.be/pages/inschrijven.html</loc>
   <lastmod>2025-03-28T08:03:14+00:00</lastmod>
-  <priority>0.80</priority>
+  <priority>0.50</priority>
 </url>
 <url>
   <loc>https://plus13merksplas.be/pages/fotos.html</loc>
   <lastmod>2025-03-28T08:03:14+00:00</lastmod>
-  <priority>0.80</priority>
+  <priority>0.70</priority>
 </url>
 <url>
   <loc>https://plus13merksplas.be/pages/begeleiding.html</loc>
-  <lastmod>2025-03-28T08:03:14+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://plus13merksplas.be/pages/plusBarTien.html</loc>
   <lastmod>2025-03-28T08:03:14+00:00</lastmod>
   <priority>0.80</priority>
 </url>
@@ -40,12 +35,17 @@
 <url>
   <loc>https://plus13merksplas.be/pages/contact.html</loc>
   <lastmod>2025-03-28T08:03:14+00:00</lastmod>
-  <priority>0.80</priority>
+  <priority>0.70</priority>
 </url>
 <url>
   <loc>https://plus13merksplas.be/index.html</loc>
   <lastmod>2025-03-28T08:03:14+00:00</lastmod>
-  <priority>0.64</priority>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://plus13merksplas.be/pages/info.html</loc>
+  <lastmod>2025-03-28T08:03:14+00:00</lastmod>
+  <priority>0.90</priority>
 </url>
 
 
