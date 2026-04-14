@@ -114,12 +114,7 @@ img {
     height: fit-content;
     width: 40%;
     text-align: center;
-    a:link {
-          color: #00008B; /* Custom unvisited link color */
-            }
-        a:visited {
-                  color: #00008B; /* Custom visited link color */
-            }
+
         
 }
 .contact-box,.info-box{
@@ -127,6 +122,12 @@ img {
     border-radius: 10px;
     height: fit-content;
     text-align: center;
+        a:link {
+          color: #00008B; /* Custom unvisited link color */
+            }
+        a:visited {
+          color: #00008B; /* Custom visited link color */
+            }
     
 }
 .contact-box a {
