@@ -18,7 +18,7 @@
 <body class="d-flex flex-column min-vh-100">
     <header id="nav-placeholder"></header>
     <!-- PlusBarTien Event Popup -->
-<div id="event-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:none;align-items:center;justify-content:center;padding:1rem;" onclick="if(event.target===this)this.style.display='none'">
+<div id="event-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:none;align-items:center;justify-content:center;padding:1rem;opacity:0;transition:opacity 0.4s ease;" onclick="if(event.target===this)this.style.display='none'">
   <div style="background:#fff;border-radius:16px;max-width:400px;width:100%;overflow:hidden;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
 
     <button onclick="document.getElementById('event-overlay').style.display='none'" style="position:absolute;top:10px;right:12px;background:rgba(0,0,0,0.2);border:none;border-radius:999px;width:28px;height:28px;font-size:16px;color:#fff;cursor:pointer;z-index:10;">&times;</button>
