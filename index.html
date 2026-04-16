@@ -17,7 +17,56 @@
 
 <body class="d-flex flex-column min-vh-100">
     <header id="nav-placeholder"></header>
-    
+    <!-- PlusBarTien Event Popup -->
+<div id="event-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:#fff;border-radius:16px;max-width:400px;width:100%;overflow:hidden;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+
+    <button onclick="document.getElementById('event-overlay').style.display='none'" style="position:absolute;top:10px;right:12px;background:rgba(0,0,0,0.2);border:none;border-radius:999px;width:28px;height:28px;font-size:16px;color:#fff;cursor:pointer;z-index:10;">&times;</button>
+
+    <img src="img/popup.jpg" alt="PlusBarTien" style="width:100%;height:160px;object-fit:cover;display:block;">
+
+    <!-- Wat -->
+    <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border-bottom:1px solid #f5e8d8;">
+      <div style="width:44px;height:44px;border-radius:10px;background:#fdeac0;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="#f66e1a" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <div style="font-size:11px;color:#999;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Wat</div>
+        <div style="font-size:16px;font-weight:600;color:#1a1a1a;">PlusBarTien!</div>
+      </div>
+    </div>
+
+    <!-- Wanneer -->
+    <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border-bottom:1px solid #f5e8d8;">
+      <div style="width:44px;height:44px;border-radius:10px;background:#fdeac0;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="17" rx="3" stroke="#f66e1a" stroke-width="1.8"/><path d="M3 9h18" stroke="#f66e1a" stroke-width="1.8"/><path d="M8 2v4M16 2v4" stroke="#f66e1a" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <div style="font-size:11px;color:#999;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Wanneer</div>
+        <div style="font-size:16px;font-weight:600;color:#1a1a1a;">Vrijdag 1 mei 2026</div>
+      </div>
+    </div>
+
+    <!-- Waar -->
+    <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border-bottom:1px solid #f5e8d8;">
+      <div style="width:44px;height:44px;border-radius:10px;background:#fdeac0;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="#f66e1a" stroke-width="1.8"/><circle cx="12" cy="9" r="2.5" stroke="#f66e1a" stroke-width="1.8"/></svg>
+      </div>
+      <div>
+        <div style="font-size:11px;color:#999;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Waar</div>
+        <div style="font-size:16px;font-weight:600;color:#1a1a1a;">Merksplas</div>
+      </div>
+    </div>
+
+    <!-- Link -->
+    <div style="padding:1.25rem;">
+      <a href="/pages/info.html#pPlus_Bar_Tien" style="display:block;background:#f66e1a;color:#fff;text-align:center;padding:.85rem;border-radius:10px;font-size:15px;font-weight:600;text-decoration:none;">
+        Meer info hier &rarr;
+      </a>
+    </div>
+
+  </div>
+</div>
     <main class="container">
         <div class="homePage mt-3 row d-flex">
             <img src="img/Groepsfoto.jpg" alt="Groepsfoto" class="col-12 p-0 groepsfoto">
