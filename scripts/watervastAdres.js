@@ -1,14 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  form.addEventListener("submit", (e) => {
-  // Controleer de velden nog één keer vlak voor verzenden
-  validateForm();
-  
-  // Als de submit knop nog steeds disabled is (formulier is niet geldig), stop de verzending!
-  if (submitButton.disabled) {
-    e.preventDefault(); // Dit blokkeert de verzending
-    alert("Leuke poging, maar je moet het formulier wel correct invullen! 😉");
-  }
-});
   const form = document.getElementById("inschrijfForm");
   const submitButton = document.getElementById("submitButton");
 
@@ -193,6 +183,16 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("click", (e) => {
     if (!straatInput.contains(e.target) && !dropdownContainer.contains(e.target)) {
       hideDropdown();
+    }
+  });
+
+  // --- EXTRA BEVEILIGING (De gefixte toevoeging) ---
+  form.addEventListener("submit", (e) => {
+    validateForm();
+    if (submitButton.disabled) {
+      e.preventDefault(); // Blokkeert de verzending
+      e.stopImmediatePropagation(); // Voorkomt dat formHandler.js per ongeluk alsnog vuurt
+      alert("Leuke poging, maar je moet het formulier wel correct invullen! 😉");
     }
   });
 });
