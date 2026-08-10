@@ -47,7 +47,9 @@
         <div class="row">
           <div class="col-md-9 mb-3">
             <label for="straat" class="form-label">Straat:</label>
-            <input type="text" class="form-control" id="straat" name="straat" required>
+            <!-- list toegevoegd om de datalist te koppelen, id en name blijven identiek -->
+            <input type="text" class="form-control" id="straat" name="straat" list="straatnamenLijst" autocomplete="off" required>
+            <datalist id="straatnamenLijst"></datalist>
           </div>
           <div class="col-md-3 mb-3">
             <label for="nummer" class="form-label">Nummer:</label>
@@ -61,7 +63,8 @@
           </div>
           <div class="col-md-8 mb-3">
             <label for="gemeente" class="form-label">Gemeente:</label>
-            <input type="text" class="form-control" id="gemeente" name="gemeente" required>
+            <!-- readonly toegevoegd zodat leden geen schrijffouten maken, id en name blijven identiek -->
+            <input type="text" class="form-control" id="gemeente" name="gemeente" readonly required>
           </div>
         </div>
       </fieldset>
@@ -127,32 +130,8 @@
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eJ7yQe5hF4yEw" crossorigin="anonymous"></script>
   <script src="/scripts/loadNavbar.js"></script>
+  <script src="../scripts/adresAPI.js"></script>
   <script src="../scripts/formHandler.js"></script>
 </body>
 
-
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
