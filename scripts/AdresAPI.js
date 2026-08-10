@@ -236,23 +236,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- DE GOOGLE RECAPTCHA TROLL ---
+  // --- DE GOOGLE RECAPTCHA TROLL (Veilige Bootstrap 5 versie) ---
   const fotosSelect = document.getElementById("fotosOK");
   const captchaModalEl = document.getElementById("captchaModal");
-  let captchaModal;
-  
-  if (typeof bootstrap !== 'undefined' && captchaModalEl) {
-    captchaModal = new bootstrap.Modal(captchaModalEl);
-  }
-
   let isCaptchaPassed = false;
 
-  // Deze functie roept Google ZELF aan als het vinkje groen is!
-  // MOET gekoppeld zijn aan de 'window', anders vindt Google hem niet.
   window.reCaptchaGelukt = function() {
     isCaptchaPassed = true;
     setTimeout(() => {
-      if (captchaModal) captchaModal.hide();
+      if (typeof bootstrap !== 'undefined' && captchaModalEl) {
+        bootstrap.Modal.getOrCreateInstance(captchaModalEl).hide();
+      }
     }, 800);
   };
 
@@ -261,18 +255,20 @@ document.addEventListener("DOMContentLoaded", () => {
       if (this.value === "Nee") {
         isCaptchaPassed = false;
         
-        // Reset de widget zodat het vinkje weer leeg is
         if (typeof grecaptcha !== 'undefined') {
           grecaptcha.reset();
         }
         
-        // Toon de pop-up
-        if (captchaModal) captchaModal.show();
+        // Dwing de modal om direct te openen
+        if (typeof bootstrap !== 'undefined' && captchaModalEl) {
+          bootstrap.Modal.getOrCreateInstance(captchaModalEl).show();
+        } else {
+          console.error("Bootstrap of de modal is niet geladen!");
+        }
       }
     });
   }
 
-  // De straf: Als ze het venster sluiten ZONDER dat isCaptchaPassed = true
   if (captchaModalEl) {
     captchaModalEl.addEventListener("hide.bs.modal", function() {
       if (!isCaptchaPassed && fotosSelect) {
@@ -280,4 +276,3 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-});
