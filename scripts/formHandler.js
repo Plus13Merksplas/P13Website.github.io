@@ -11,7 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (submitButton) {
                 submitButton.disabled = true;
-                submitButton.textContent = <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Gegevens veilig verwerken...;
+                // OPGELOST: innerHTML in plaats van textContent, én met aanhalingstekens eromheen!
+                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Gegevens veilig verwerken...';
             }
 
             const formData = new FormData(form);
@@ -45,14 +46,19 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 // HIER ZIT DE ANTI-HACK TRUC:
-                // We kijken of de server validatie (Google Script) een fout heeft gevonden
                 if (data.startsWith("Fout bij validatie")) {
                     responseMessage.style.display = 'block';
                     responseMessage.classList.remove('alert-success');
                     responseMessage.classList.add('alert-danger');
                     responseMessage.textContent = data; // Toont "Ongeldige postcode" etc.
                     responseMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    return; // Stop met uitvoeren (dus ga NIET naar de bedankt pagina)
+                    
+                    // Knop herstellen bij een fout
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Verstuur inschrijving';
+                    }
+                    return; 
                 }
 
                 // GEEN FOUTEN? Kijk of we moeten doorsturen!
@@ -69,6 +75,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     responseMessage.textContent = "Bedankt! Je inschrijving is goed ontvangen."; 
                     form.reset();
                     responseMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Verstuur inschrijving';
+                    }
                 }
             })
             .catch(error => {
@@ -77,10 +88,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 responseMessage.classList.remove('alert-success');
                 responseMessage.classList.add('alert-danger');
                 responseMessage.textContent = 'Er ging iets mis. Probeer het later opnieuw.';
-            })
-            .finally(() => {
-                // Dit zorgt dat de knop weer werkt als er toch iets fout ging
-                if (submitButton && !data?.startsWith("Fout bij validatie")) {
+                
+                // Knop herstellen als het internet uitvalt
+                if (submitButton) {
                     submitButton.disabled = false;
                     submitButton.textContent = 'Verstuur inschrijving';
                 }
