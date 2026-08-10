@@ -232,17 +232,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- DE GOOGLE RECAPTCHA TROLL (BOM-PROOF VERSIE) ---
+  // --- DE GOOGLE RECAPTCHA TROLL (ONBREEKBARE BRUTE-FORCE VERSIE) ---
   const fotosSelect = document.getElementById("fotosOK");
   const captchaModalEl = document.getElementById("captchaModal");
   let isCaptchaPassed = false;
 
+  // Functie om de pop-up handmatig en geforceerd te sluiten
+  const sluitModal = () => {
+    if (captchaModalEl) {
+      captchaModalEl.classList.remove('show');
+      captchaModalEl.style.display = 'none';
+      captchaModalEl.style.backgroundColor = 'transparent';
+    }
+  };
+
+  // Deze functie roept Google aan zodra het vinkje groen is!
   window.reCaptchaGelukt = function() {
     isCaptchaPassed = true;
     setTimeout(() => {
-      if (typeof bootstrap !== 'undefined' && captchaModalEl) {
-        bootstrap.Modal.getOrCreateInstance(captchaModalEl).hide();
-      }
+      sluitModal();
     }, 800);
   };
 
@@ -251,37 +259,33 @@ document.addEventListener("DOMContentLoaded", () => {
       if (this.value === "Nee") {
         isCaptchaPassed = false;
         
-        // CHECK 1: Heb je de HTML wel erin geplakt?
         if (!captchaModalEl) {
-          alert("Oeps! De pop-up HTML (captchaModal) ontbreekt ergens onderaan je webpagina. Voor nu wordt je keuze verplicht terug op 'Ja' gezet.");
+          alert("Pop-up HTML ontbreekt. Keuze wordt op Ja gezet.");
           this.value = "Ja";
           return;
         }
 
-        // CHECK 2: Crasht Google? We negeren het gewoon!
-        if (typeof grecaptcha !== 'undefined') {
-          try {
-            grecaptcha.reset();
-          } catch (e) {
-            console.warn("Google widget kon even niet gereset worden, we openen gewoon de modal.");
-          }
+        // Reset de Google widget als ze het opnieuw proberen
+        if (typeof window.grecaptcha !== 'undefined') {
+          try { window.grecaptcha.reset(); } catch (e) {}
         }
         
-        // CHECK 3: Open de Modal (en geef melding als Bootstrap ontbreekt)
-        if (typeof bootstrap !== 'undefined') {
-          bootstrap.Modal.getOrCreateInstance(captchaModalEl).show();
-        } else {
-          alert("Fout: Het designpakket (Bootstrap) is niet goed geladen. Keuze wordt op Ja gezet.");
-          this.value = "Ja";
-        }
-      }
-    });
-  }
-
-  if (captchaModalEl) {
-    captchaModalEl.addEventListener("hide.bs.modal", function() {
-      if (!isCaptchaPassed && fotosSelect) {
-        fotosSelect.value = "Ja"; 
+        // BRUTE FORCE: Open de modal handmatig via pure CSS (negeert Bootstrap volledig)
+        captchaModalEl.classList.add('show');
+        captchaModalEl.style.display = 'block';
+        captchaModalEl.style.backgroundColor = 'rgba(0,0,0,0.6)'; // Donkere waas op de achtergrond
+        
+        // Zorg dat de Annuleer/Sluit knoppen in de modal hem ook weer kunnen sluiten
+        const closeBtns = captchaModalEl.querySelectorAll('[data-bs-dismiss="modal"]');
+        closeBtns.forEach(btn => {
+          btn.onclick = function() {
+            sluitModal();
+            // Als ze sluiten zonder succesvolle captcha, straffen we ze door hem op Ja te zetten:
+            if (!isCaptchaPassed) {
+              fotosSelect.value = "Ja";
+            }
+          };
+        });
       }
     });
   }
