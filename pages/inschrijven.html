@@ -85,7 +85,8 @@
         <label for="gsm_visible" class="form-label">GSM-nummer:</label>
         <div class="input-group">
           <span class="input-group-text bg-light fw-bold" id="gsm-prefix">+32</span>
-          <input type="text" class="form-control" id="gsm_visible" placeholder="412 34 56 78" pattern="\d{9}" maxlength="9" inputmode="numeric" required>
+          <!-- Pattern en maxlength zijn aangepast naar 12 karakters om spaties toe te laten -->
+          <input type="text" class="form-control" id="gsm_visible" placeholder="412 34 56 78" pattern="[0-9\s]{12}" maxlength="12" inputmode="numeric" required>
         </div>
         <!-- Foutmelding GSM -->
         <div id="gsmError" class="text-danger small mt-1 d-none">Dit nummer is te kort.</div>
