@@ -11,76 +11,92 @@ document.addEventListener("DOMContentLoaded", () => {
   const gsmVisible = document.getElementById("gsm_visible");
   const gsmHidden = document.getElementById("gsm");
 
-  // Hier slaan we de goedgekeurde straten van de API in op
+  // De nieuwe foutmelding-elementen ophalen
+  const postcodeError = document.getElementById("postcodeError");
+  const straatError = document.getElementById("straatError");
+  const gsmError = document.getElementById("gsmError");
+
   let toegestaneStraten = [];
 
   const hideDropdown = () => {
     dropdownContainer.style.display = "none";
   };
 
-  // DE HOOFDCONTROLEKAMER: Deze functie runt elke keer als iemand iets typt
   const validateForm = () => {
     let isFormValid = true;
 
-    // Direct eventuele per ongeluk getypte letters strippen uit numerieke velden
     postcodeInput.value = postcodeInput.value.replace(/\D/g, '');
     gsmVisible.value = gsmVisible.value.replace(/\D/g, '');
 
-    // 1. Postcode Controle (Exact 4 cijfers)
+    // 1. Postcode Controle
     const pc = postcodeInput.value;
     if (pc.length === 0) {
       postcodeInput.classList.remove("is-valid", "is-invalid");
+      postcodeError.classList.add("d-none"); // Verberg fout als veld nog leeg is
       isFormValid = false;
     } else if (pc.length === 4) {
       postcodeInput.classList.remove("is-invalid");
-      postcodeInput.classList.add("is-valid"); // Groen randje
+      postcodeInput.classList.add("is-valid");
+      postcodeError.classList.add("d-none"); // Alles klopt, verberg fout
     } else {
       postcodeInput.classList.remove("is-valid");
-      postcodeInput.classList.add("is-invalid"); // Rood randje
+      postcodeInput.classList.add("is-invalid");
+      postcodeError.classList.remove("d-none"); // Toon fout: "Een postcode bevat 4 cijfers."
       isFormValid = false;
     }
 
-    // 2. Straat Controle (Moet exact in de API-lijst staan)
+    // 2. Straat Controle
     const straat = straatInput.value.trim().toLowerCase();
-    // We maken alle API straten ook kleine letters om veilig te vergelijken
     const geldigeStratenLower = toegestaneStraten.map(s => s.toLowerCase());
-
+    
     if (straat.length === 0) {
       straatInput.classList.remove("is-valid", "is-invalid");
+      straatError.classList.add("d-none");
       isFormValid = false;
     } else if (geldigeStratenLower.includes(straat)) {
       straatInput.classList.remove("is-invalid");
       straatInput.classList.add("is-valid");
+      straatError.classList.add("d-none");
     } else {
+      // Straat klopt niet! Pak de naam van de gemeente (of val terug op 'deze gemeente')
+      const huidigeGemeente = gemeenteInput.value.trim() || "deze gemeente";
+      
       straatInput.classList.remove("is-valid");
       straatInput.classList.add("is-invalid");
+      
+      // Update de tekst in de foutmelding
+      straatError.textContent = `Deze straat bestaat niet in ${huidigeGemeente}.`;
+      straatError.classList.remove("d-none"); // Toon de fout
+      
       isFormValid = false;
     }
 
-    // 3. GSM Controle (Exact 9 cijfers)
+    // 3. GSM Controle
     const gsmVal = gsmVisible.value;
     if (gsmVal.length === 0) {
       gsmVisible.classList.remove("is-valid", "is-invalid");
+      gsmError.classList.add("d-none");
       gsmHidden.value = "";
       isFormValid = false;
     } else if (gsmVal.length === 9) {
       gsmVisible.classList.remove("is-invalid");
       gsmVisible.classList.add("is-valid");
-      // Plak hier de +32 en de 9 cijfers samen voor je Python script!
+      gsmError.classList.add("d-none");
       gsmHidden.value = "+32" + gsmVal; 
     } else {
       gsmVisible.classList.remove("is-valid");
       gsmVisible.classList.add("is-invalid");
+      gsmError.classList.remove("d-none"); // Toon fout: "Dit nummer is te kort."
       gsmHidden.value = "";
       isFormValid = false;
     }
 
-    // 4. Standaard HTML5 Controles (Zijn naam, email, en radio buttons ingevuld?)
+    // 4. Standaard HTML5 Controles
     if (!form.checkValidity()) {
       isFormValid = false;
     }
 
-    // Pas als ELKE check hierboven true is, maken we de knop klikbaar
+    // Knop ontgrendelen of blokkeren
     if (isFormValid) {
       submitButton.disabled = false;
       submitButton.textContent = "Verstuur inschrijving";
@@ -90,11 +106,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // Luister naar ELKE aanpassing op het formulier en trigger de validatie
   form.addEventListener("input", validateForm);
   form.addEventListener("change", validateForm);
-
-  // --- API LOGICA ---
 
   // Postcode API
   postcodeInput.addEventListener("input", async (e) => {
@@ -114,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       gemeenteInput.value = ""; 
     }
-    validateForm(); // Hertest het formulier
+    validateForm(); 
   });
 
   // Straat API
@@ -131,7 +144,6 @@ document.addEventListener("DOMContentLoaded", () => {
         streetList.innerHTML = "";
 
         if (data.SuggestionResult && data.SuggestionResult.length > 0) {
-          // Haal de straten uit de API, filter de unieke namen eruit
           const gevondenStraten = data.SuggestionResult.map(res => res.split(',')[0].trim());
           toegestaneStraten = [...new Set(gevondenStraten)];
 
@@ -143,11 +155,10 @@ document.addEventListener("DOMContentLoaded", () => {
               button.className = "dropdown-item text-start w-100";
               button.textContent = straatnaam;
               
-              // Als iemand klikt op een dropdown-item:
               button.addEventListener("click", () => {
                 straatInput.value = straatnaam;
-                toegestaneStraten = [straatnaam]; // Maak deze direct 100% geldig
-                validateForm(); // Controleer alles en maak het randje groen
+                toegestaneStraten = [straatnaam]; 
+                validateForm(); 
                 hideDropdown();
               });
 
@@ -166,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
        hideDropdown();
     }
-    validateForm(); // Hertest het formulier bij elke getypte letter
+    validateForm(); 
   });
 
   document.addEventListener("click", (e) => {
