@@ -4,51 +4,52 @@ document.addEventListener("DOMContentLoaded", () => {
   const straatInput = document.getElementById("straat");
   const straatnamenLijst = document.getElementById("straatnamenLijst");
 
-  // 1. Postcode -> Automatisch Gemeente invullen
+  // 1. Postcode -> Automatisch Gemeente invullen (Deze werkte al perfect!)
   postcodeInput.addEventListener("input", async (e) => {
     const postcode = e.target.value.trim();
     
-    // Check of er 4 cijfers zijn ingevuld (Belgische postcodes)
     if (postcode.length === 4) {
       try {
-        // Haal locatiegegevens op via de Vlaamse overheid API
         const response = await fetch(`https://geo.api.vlaanderen.be/geolocation/v4/Location?q=${postcode}&c=1`);
         const data = await response.json();
         
         if (data.LocationResult && data.LocationResult.length > 0) {
           gemeenteInput.value = data.LocationResult[0].Municipality;
         } else {
-          gemeenteInput.value = ""; // Geen geldige Vlaamse postcode gevonden
+          gemeenteInput.value = ""; 
         }
       } catch (error) {
         console.error("Fout bij ophalen gemeente:", error);
       }
     } else {
-      gemeenteInput.value = ""; // Maak leeg als postcode geen 4 cijfers is
+      gemeenteInput.value = ""; 
     }
   });
 
-  // 2. Straat -> Automatisch suggesties geven op basis van de gemeente
+  // 2. Straat -> Suggestion API gebruiken voor live autocomplete
   straatInput.addEventListener("input", async (e) => {
     const straat = e.target.value.trim();
     const postcode = postcodeInput.value.trim();
-    const gemeente = gemeenteInput.value.trim();
 
-    // Pas zoeken als we een geldige postcode hebben én minstens 2 letters van de straat
-    if (postcode.length === 4 && gemeente && straat.length >= 2) {
+    // Pas zoeken als we een geldige postcode hebben én minstens 2 letters typen
+    if (postcode.length === 4 && straat.length >= 2) {
       try {
-        // Zoek specifiek naar straatnamen ('Thoroughfarename') in de ingevulde postcode
-        const response = await fetch(`https://geo.api.vlaanderen.be/geolocation/v4/Location?q=${straat} ${postcode}&c=10&type=Thoroughfarename`);
+        // We gebruiken nu de 'Suggestion' API in plaats van 'Location'
+        const response = await fetch(`https://geo.api.vlaanderen.be/geolocation/v4/Suggestion?q=${straat} ${postcode}&c=10`);
         const data = await response.json();
 
-        // Maak de oude lijst leeg
+        // Maak de oude lijst leeg zodat we geen dubbele of oude opties krijgen
         straatnamenLijst.innerHTML = "";
 
-        if (data.LocationResult) {
-          // De API geeft soms dubbele resultaten, deze code filtert de unieke straten eruit
-          const uniekeStraten = [...new Set(data.LocationResult.map(loc => loc.Thoroughfarename))];
+        if (data.SuggestionResult) {
+          // De API geeft "Kerkstraat, 2330 Merksplas". 
+          // We splitsen op de komma (',') en pakken [0] (het eerste deel, dus de straat)
+          const gevondenStraten = data.SuggestionResult.map(resultaat => resultaat.split(',')[0].trim());
+          
+          // Haal eventuele dubbele resultaten eruit
+          const uniekeStraten = [...new Set(gevondenStraten)];
 
-          // Voeg de gevonden straten toe aan de dropdown lijst
+          // Voeg de unieke straten toe aan de datalist
           uniekeStraten.forEach(straatnaam => {
             if (straatnaam) {
               const option = document.createElement("option");
