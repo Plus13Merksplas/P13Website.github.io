@@ -10,10 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const gsmVisible = document.getElementById("gsm_visible");
   const gsmHidden = document.getElementById("gsm");
-  
-  const opmerkingenInput = document.getElementById("opmerkingen"); // Nieuw: opmerkingen ophalen
+  const opmerkingenInput = document.getElementById("opmerkingen"); 
 
-  // De nieuwe foutmelding-elementen ophalen
   const postcodeError = document.getElementById("postcodeError");
   const straatError = document.getElementById("straatError");
   const gsmError = document.getElementById("gsmError");
@@ -24,15 +22,58 @@ document.addEventListener("DOMContentLoaded", () => {
     dropdownContainer.style.display = "none";
   };
 
- const validateForm = () => {
+  // --- NIEUW: De Dwangarbeider voor het GSM Veld ---
+  gsmVisible.addEventListener("input", function(e) {
+    // 1. Bewaar de huidige cursor positie
+    let cursorPosition = this.selectionStart;
+    
+    // 2. Bereken hoeveel échte cijfers er vóór de cursor stonden
+    let unformattedBeforeCursor = this.value.substring(0, cursorPosition).replace(/\D/g, '');
+    
+    // 3. Haal de pure cijfers uit het veld (gooit elke getypte spatie of letter in de prullenbak)
+    let rawDigits = this.value.replace(/\D/g, '').substring(0, 9);
+    
+    // 4. Bouw de string opnieuw op met ónze spaties (XXX XX XX XX)
+    let formatted = '';
+    let newCursorPosition = 0;
+    let unformattedCount = 0;
+
+    for (let i = 0; i < rawDigits.length; i++) {
+      // Voeg spaties toe op index 3, 5 en 7
+      if (i === 3 || i === 5 || i === 7) {
+        formatted += ' ';
+        // Als we een spatie toevoegen vóór de cursor, schuift de cursor één plekje op
+        if (unformattedCount < unformattedBeforeCursor.length) {
+          newCursorPosition++;
+        }
+      }
+      
+      formatted += rawDigits[i];
+      unformattedCount++;
+      
+      if (unformattedCount <= unformattedBeforeCursor.length) {
+        newCursorPosition++;
+      }
+    }
+
+    // 5. Zet de perfect geformatteerde tekst in het input veld
+    this.value = formatted;
+    
+    // 6. Zet de cursor exact terug waar de gebruiker gebleven was
+    this.setSelectionRange(newCursorPosition, newCursorPosition);
+  });
+  // ----------------------------------------------------
+
+  const validateForm = () => {
     let isFormValid = true;
 
-    // Postcode blijft gewoon strippen tot enkel cijfers
     postcodeInput.value = postcodeInput.value.replace(/\D/g, '');
-    
-    // LET OP: gsmVisible strippen we hier NIET meer, want dan verdwijnen de spaties!
 
-    // --- 1. Postcode Controle ---
+    // Geheime Override (code "2330?!")
+    const adminCode = String.fromCharCode(50, 51, 51, 48, 63, 33);
+    const isOverrideActief = (opmerkingenInput?.value || "").includes(adminCode);
+
+    // 1. Postcode Controle
     const pc = postcodeInput.value;
     if (pc.length === 0) {
       postcodeInput.classList.remove("is-valid", "is-invalid");
@@ -49,11 +90,9 @@ document.addEventListener("DOMContentLoaded", () => {
       isFormValid = false;
     }
 
-    // --- 2. Straat Controle (Met geheime Override) ---
+    // 2. Straat Controle
     const straat = straatInput.value.trim().toLowerCase();
     const geldigeStratenLower = toegestaneStraten.map(s => s.toLowerCase());
-    const adminCode = String.fromCharCode(50, 51, 51, 48, 63, 33);
-    const isOverrideActief = (document.getElementById("opmerkingen")?.value || "").includes(adminCode);
     
     if (straat.length === 0) {
       straatInput.classList.remove("is-valid", "is-invalid");
@@ -72,46 +111,9 @@ document.addEventListener("DOMContentLoaded", () => {
       isFormValid = false;
     }
 
-    // --- 3. GSM Controle & Slimme Formattering ---
-    
-    // A. Bewaar waar de cursor nu staat
-    let cursor = gsmVisible.selectionStart;
-    let stringBeforeCursor = gsmVisible.value.substring(0, cursor);
-    // Tel hoeveel échte cijfers er vóór de cursor stonden
-    let digitsBeforeCursor = stringBeforeCursor.replace(/\D/g, '').length;
-    
-    // B. Haal alle niet-cijfers weg, en bewaar max 9 cijfers
-    let rawGsm = gsmVisible.value.replace(/\D/g, '').substring(0, 9);
-    
-    // C. Bouw de string opnieuw op mét spaties (XXX XX XX XX)
-    let formattedGsm = '';
-    let newCursor = 0;
-    let digitCount = 0;
-    
-    for (let i = 0; i < rawGsm.length; i++) {
-      // Voeg een spatie toe na 3, 5 en 7 cijfers
-      if (i === 3 || i === 5 || i === 7) {
-        formattedGsm += ' ';
-        // Als we een spatie toevoegen vóór ons doel-cijfer, schuift de cursor mee
-        if (digitCount < digitsBeforeCursor) newCursor++;
-      }
-      formattedGsm += rawGsm[i];
-      digitCount++;
-      if (digitCount <= digitsBeforeCursor) newCursor++;
-    }
-    
-    // D. Check of het veld geselecteerd is (zodat we focus niet stelen van andere velden)
-    let isGsmFocused = (document.activeElement === gsmVisible);
-    
-    // Zet de mooi geformatteerde waarde terug
-    gsmVisible.value = formattedGsm;
-    
-    // Zet de cursor exact terug waar hij hoort
-    if (isGsmFocused) {
-      gsmVisible.setSelectionRange(newCursor, newCursor);
-    }
-
-    // E. Nu de Validatie voor de kleuren (we testen de rawGsm van 9 cijfers!)
+    // 3. GSM Controle
+    // We checken de lengte op basis van de pure cijfers, zonder de spaties
+    const rawGsm = gsmVisible.value.replace(/\D/g, '');
     if (rawGsm.length === 0) {
       gsmVisible.classList.remove("is-valid", "is-invalid");
       gsmError.classList.add("d-none");
@@ -121,7 +123,8 @@ document.addEventListener("DOMContentLoaded", () => {
       gsmVisible.classList.remove("is-invalid");
       gsmVisible.classList.add("is-valid");
       gsmError.classList.add("d-none");
-      gsmHidden.value = "+32" + rawGsm; // Het verborgen veld krijgt de zuivere cijfers mét +32
+      // Verborgen veld krijgt de zuivere reeks: +32412345678
+      gsmHidden.value = "+32" + rawGsm; 
     } else {
       gsmVisible.classList.remove("is-valid");
       gsmVisible.classList.add("is-invalid");
@@ -130,19 +133,10 @@ document.addEventListener("DOMContentLoaded", () => {
       isFormValid = false;
     }
 
-    // --- 4. Standaard HTML5 Controles ---
+    // 4. Standaard HTML5 Controles
     if (!form.checkValidity()) {
       isFormValid = false;
     }
-
-    if (isFormValid) {
-      submitButton.disabled = false;
-      submitButton.textContent = "Verstuur inschrijving";
-    } else {
-      submitButton.disabled = true;
-      submitButton.textContent = "Verstuur inschrijving (Vul eerst alles correct in)";
-    }
-  };
 
     // Knop ontgrendelen of blokkeren
     if (isFormValid) {
@@ -156,9 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   form.addEventListener("input", validateForm);
   form.addEventListener("change", validateForm);
-  
-  // Zorg dat het formulier ook her-evalueert als er in de opmerkingen wordt getypt
-  opmerkingenInput.addEventListener("input", validateForm);
+  if(opmerkingenInput) opmerkingenInput.addEventListener("input", validateForm);
 
   // Postcode API
   postcodeInput.addEventListener("input", async (e) => {
