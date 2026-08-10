@@ -22,6 +22,7 @@
     <h2 class="mb-3">Inschrijven Plus 13 Merksplas</h2>
     <p class="mb-4">Vul onderstaand formulier in om je in te schrijven bij Plus 13 Merksplas.</p>
 
+    <!-- id="inschrijfForm" is belangrijk voor onze validatie -->
     <form id="inschrijfForm" method="POST"
       action="https://script.google.com/macros/s/AKfycbx-kLZCy-mK5kRjlL8hLy5-rzbLIagwwcJX_kFw550Ip3QeoIF2bc5HIAAzt4-vput8/exec"  data-redirect="bedankt.html">
 
@@ -45,11 +46,11 @@
       <fieldset class="mb-3 p-3 border rounded position-relative">
         <legend class="float-none w-auto px-2 fs-5">Adresgegevens</legend>
         
-        <!-- RIJ 1: EERST Postcode en Gemeente -->
         <div class="row">
           <div class="col-md-4 mb-3">
             <label for="postcode" class="form-label">Postcode:</label>
-            <input type="text" class="form-control" id="postcode" name="postcode" required>
+            <!-- pattern en maxlength forceren 4 cijfers -->
+            <input type="text" class="form-control" id="postcode" name="postcode" pattern="\d{4}" maxlength="4" inputmode="numeric" required>
           </div>
           <div class="col-md-8 mb-3">
             <label for="gemeente" class="form-label">Gemeente:</label>
@@ -57,12 +58,10 @@
           </div>
         </div>
 
-        <!-- RIJ 2: DAARNA pas Straat en Nummer -->
         <div class="row">
-          <div class="col-md-9 mb-3">
+          <div class="col-md-9 mb-3 position-relative">
             <label for="straat" class="form-label">Straat:</label>
             <input type="text" class="form-control" id="straat" name="straat" autocomplete="off" required>
-            
             <div id="customStreetDropdown" class="dropdown-menu w-100 shadow" style="max-height: 250px; overflow-y: auto; display: none; position: absolute; z-index: 1000;">
               <ul class="list-unstyled mb-0" id="customStreetList"></ul>
             </div>
@@ -80,9 +79,17 @@
         <input type="email" class="form-control" id="email" name="email" required>
       </div>
 
+      <!-- NIEUWE GSM OPLOSSING -->
       <div class="mb-3">
-        <label for="gsm" class="form-label">GSM-nummer:</label>
-        <input type="tel" class="form-control" id="gsm" name="gsm" placeholder="Bijv. +32 412 34 56 78" required>
+        <label for="gsm_visible" class="form-label">GSM-nummer:</label>
+        <div class="input-group">
+          <!-- Visueel 'vast' +32 blokje -->
+          <span class="input-group-text bg-light fw-bold" id="gsm-prefix">+32</span>
+          <!-- Enkel 9 cijfers toegestaan -->
+          <input type="text" class="form-control" id="gsm_visible" placeholder="412 34 56 78" pattern="\d{9}" maxlength="9" inputmode="numeric" required>
+        </div>
+        <!-- Dit verborgen veld is wat 'name="gsm"' meestuurt naar je script, inclusief de +32 -->
+        <input type="hidden" id="gsm" name="gsm">
       </div>
 
       <div class="mb-3">
@@ -119,8 +126,9 @@
         <textarea class="form-control" id="opmerkingen" name="opmerkingen" rows="4"></textarea>
       </div>
 
-      <button type="submit" class="btn btn-primary w-100" id="submitButton">
-        Verstuur inschrijving
+      <!-- Knop start als disabled! -->
+      <button type="submit" class="btn btn-primary w-100" id="submitButton" disabled>
+        Verstuur inschrijving (Vul eerst alles correct in)
       </button>
       <div id="responseMessage" class="mt-3" style="display: none;"></div>
     </form>
