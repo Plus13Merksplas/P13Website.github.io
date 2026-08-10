@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (submitButton) {
                 submitButton.disabled = true;
                 // OPGELOST: innerHTML in plaats van textContent, én met aanhalingstekens eromheen!
-                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Gegevens veilig verwerken...';
+                submitButton.innerHTML = 'Aan het verzenden <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>';
             }
 
             const formData = new FormData(form);
