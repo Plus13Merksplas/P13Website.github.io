@@ -54,7 +54,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (postcodeInput) postcodeInput.value = postcodeInput.value.replace(/\D/g, '');
 
-    // Geheime Override (code "2330?!")
     const adminCode = String.fromCharCode(50, 51, 51, 48, 63, 33);
     const isOverrideActief = opmerkingenInput ? opmerkingenInput.value.includes(adminCode) : false;
 
@@ -124,10 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // 4. Form validiteit
-    if (form && !form.checkValidity()) {
-      isFormValid = false;
-    }
+    if (form && !form.checkValidity()) isFormValid = false;
 
     if (submitButton) {
       if (isFormValid) {
@@ -140,7 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // Event listeners voor validatie
+  // Event listeners
   if (form) {
     form.addEventListener("input", validateForm);
     form.addEventListener("change", validateForm);
@@ -201,7 +197,6 @@ document.addEventListener("DOMContentLoaded", () => {
                   validateForm(); 
                   hideDropdown();
                 });
-
                 li.appendChild(button);
                 streetList.appendChild(li);
               }
@@ -211,7 +206,6 @@ document.addEventListener("DOMContentLoaded", () => {
             hideDropdown();
           }
         } catch (error) {
-          console.error(error);
           hideDropdown();
         }
       } else {
@@ -221,14 +215,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Klik ergens anders = verberg dropdown
   document.addEventListener("click", (e) => {
     if (straatInput && dropdownContainer && !straatInput.contains(e.target) && !dropdownContainer.contains(e.target)) {
       hideDropdown();
     }
   });
 
-  // Beveiliging tegen handmatig submitten
   if (form) {
     form.addEventListener("submit", (e) => {
       validateForm();
@@ -240,12 +232,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- DE GOOGLE RECAPTCHA TROLL ---
+  // --- DE GOOGLE RECAPTCHA TROLL (BOM-PROOF VERSIE) ---
   const fotosSelect = document.getElementById("fotosOK");
   const captchaModalEl = document.getElementById("captchaModal");
   let isCaptchaPassed = false;
 
-  // Maak de callback bereikbaar voor Google
   window.reCaptchaGelukt = function() {
     isCaptchaPassed = true;
     setTimeout(() => {
@@ -255,32 +246,42 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 800);
   };
 
-  // Luister naar de Keuzelijst (Dropdown)
   if (fotosSelect) {
     fotosSelect.addEventListener("change", function() {
       if (this.value === "Nee") {
         isCaptchaPassed = false;
         
-        // Reset Google Captcha indien aanwezig
+        // CHECK 1: Heb je de HTML wel erin geplakt?
+        if (!captchaModalEl) {
+          alert("Oeps! De pop-up HTML (captchaModal) ontbreekt ergens onderaan je webpagina. Voor nu wordt je keuze verplicht terug op 'Ja' gezet.");
+          this.value = "Ja";
+          return;
+        }
+
+        // CHECK 2: Crasht Google? We negeren het gewoon!
         if (typeof grecaptcha !== 'undefined') {
-          grecaptcha.reset();
+          try {
+            grecaptcha.reset();
+          } catch (e) {
+            console.warn("Google widget kon even niet gereset worden, we openen gewoon de modal.");
+          }
         }
         
-        // Open de Modal via Bootstrap
-        if (typeof bootstrap !== 'undefined' && captchaModalEl) {
+        // CHECK 3: Open de Modal (en geef melding als Bootstrap ontbreekt)
+        if (typeof bootstrap !== 'undefined') {
           bootstrap.Modal.getOrCreateInstance(captchaModalEl).show();
         } else {
-          console.error("Bootstrap is niet geladen, modal kan niet openen.");
+          alert("Fout: Het designpakket (Bootstrap) is niet goed geladen. Keuze wordt op Ja gezet.");
+          this.value = "Ja";
         }
       }
     });
   }
 
-  // Straf indien pop-up gesloten wordt zonder succes
   if (captchaModalEl) {
     captchaModalEl.addEventListener("hide.bs.modal", function() {
       if (!isCaptchaPassed && fotosSelect) {
-        fotosSelect.value = "Ja"; // BOEM, weer terug naar Ja!
+        fotosSelect.value = "Ja"; 
       }
     });
   }
