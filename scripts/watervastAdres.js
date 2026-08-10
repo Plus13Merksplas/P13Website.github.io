@@ -1,89 +1,153 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Elementen ophalen
+  const form = document.getElementById("inschrijfForm");
+  const submitButton = document.getElementById("submitButton");
+
   const postcodeInput = document.getElementById("postcode");
   const gemeenteInput = document.getElementById("gemeente");
   const straatInput = document.getElementById("straat");
   const dropdownContainer = document.getElementById("customStreetDropdown");
   const streetList = document.getElementById("customStreetList");
 
-  // DEBUGINFO: Controleren of de elementen gevonden zijn
-  console.log("watervastAdres.js geladen. Elementen:", {postcodeInput, gemeenteInput, straatInput, dropdownContainer, streetList});
+  const gsmVisible = document.getElementById("gsm_visible");
+  const gsmHidden = document.getElementById("gsm");
 
-  // HULPFUNCTIE: Lijst verbergen
+  // Hier slaan we de goedgekeurde straten van de API in op
+  let toegestaneStraten = [];
+
   const hideDropdown = () => {
-    console.log("Dropdown verbergen.");
     dropdownContainer.style.display = "none";
-    streetList.innerHTML = "";
   };
 
-  // 1. Postcode -> Gemeente invullen
+  // DE HOOFDCONTROLEKAMER: Deze functie runt elke keer als iemand iets typt
+  const validateForm = () => {
+    let isFormValid = true;
+
+    // Direct eventuele per ongeluk getypte letters strippen uit numerieke velden
+    postcodeInput.value = postcodeInput.value.replace(/\D/g, '');
+    gsmVisible.value = gsmVisible.value.replace(/\D/g, '');
+
+    // 1. Postcode Controle (Exact 4 cijfers)
+    const pc = postcodeInput.value;
+    if (pc.length === 0) {
+      postcodeInput.classList.remove("is-valid", "is-invalid");
+      isFormValid = false;
+    } else if (pc.length === 4) {
+      postcodeInput.classList.remove("is-invalid");
+      postcodeInput.classList.add("is-valid"); // Groen randje
+    } else {
+      postcodeInput.classList.remove("is-valid");
+      postcodeInput.classList.add("is-invalid"); // Rood randje
+      isFormValid = false;
+    }
+
+    // 2. Straat Controle (Moet exact in de API-lijst staan)
+    const straat = straatInput.value.trim().toLowerCase();
+    // We maken alle API straten ook kleine letters om veilig te vergelijken
+    const geldigeStratenLower = toegestaneStraten.map(s => s.toLowerCase());
+
+    if (straat.length === 0) {
+      straatInput.classList.remove("is-valid", "is-invalid");
+      isFormValid = false;
+    } else if (geldigeStratenLower.includes(straat)) {
+      straatInput.classList.remove("is-invalid");
+      straatInput.classList.add("is-valid");
+    } else {
+      straatInput.classList.remove("is-valid");
+      straatInput.classList.add("is-invalid");
+      isFormValid = false;
+    }
+
+    // 3. GSM Controle (Exact 9 cijfers)
+    const gsmVal = gsmVisible.value;
+    if (gsmVal.length === 0) {
+      gsmVisible.classList.remove("is-valid", "is-invalid");
+      gsmHidden.value = "";
+      isFormValid = false;
+    } else if (gsmVal.length === 9) {
+      gsmVisible.classList.remove("is-invalid");
+      gsmVisible.classList.add("is-valid");
+      // Plak hier de +32 en de 9 cijfers samen voor je Python script!
+      gsmHidden.value = "+32" + gsmVal; 
+    } else {
+      gsmVisible.classList.remove("is-valid");
+      gsmVisible.classList.add("is-invalid");
+      gsmHidden.value = "";
+      isFormValid = false;
+    }
+
+    // 4. Standaard HTML5 Controles (Zijn naam, email, en radio buttons ingevuld?)
+    if (!form.checkValidity()) {
+      isFormValid = false;
+    }
+
+    // Pas als ELKE check hierboven true is, maken we de knop klikbaar
+    if (isFormValid) {
+      submitButton.disabled = false;
+      submitButton.textContent = "Verstuur inschrijving";
+    } else {
+      submitButton.disabled = true;
+      submitButton.textContent = "Verstuur inschrijving (Vul eerst alles correct in)";
+    }
+  };
+
+  // Luister naar ELKE aanpassing op het formulier en trigger de validatie
+  form.addEventListener("input", validateForm);
+  form.addEventListener("change", validateForm);
+
+  // --- API LOGICA ---
+
+  // Postcode API
   postcodeInput.addEventListener("input", async (e) => {
     const postcode = e.target.value.trim();
-    console.log(`Postcode input: '${postcode}'`);
-    
     if (postcode.length === 4) {
-      console.log("Geldige Vlaamse postcode. Gemeente opzoeken...");
       try {
         const response = await fetch(`https://geo.api.vlaanderen.be/geolocation/v4/Location?q=${postcode}&c=1`);
         const data = await response.json();
-        console.log("Gemeente API response:", data);
-        
         if (data.LocationResult && data.LocationResult.length > 0) {
-          const municipality = data.LocationResult[0].Municipality;
-          console.log(`Gemeente gevonden: ${municipality}. Veld invullen.`);
-          gemeenteInput.value = municipality;
+          gemeenteInput.value = data.LocationResult[0].Municipality;
         } else {
-          console.log("Geen Vlaamse gemeente gevonden voor deze postcode.");
           gemeenteInput.value = ""; 
         }
       } catch (error) {
-        console.error("Fout bij ophalen gemeente via API:", error);
+        console.error(error);
       }
     } else {
       gemeenteInput.value = ""; 
     }
+    validateForm(); // Hertest het formulier
   });
 
-  // 2. Straat -> Live dropdown opbouwen
+  // Straat API
   straatInput.addEventListener("input", async (e) => {
     const straatQuery = e.target.value.trim();
     const postcode = postcodeInput.value.trim();
     const gemeente = gemeenteInput.value.trim();
     
-    console.log(`Straat input: '${straatQuery}'. Postcode: ${postcode}. Gemeente: ${gemeente}`);
-
-    // Voorwaarde: minimaal 2 letters én een geldige postcode en gemeente
     if (postcode.length === 4 && gemeente && straatQuery.length >= 2) {
-      console.log("Voorwaarden voldaan. Straten opzoeken via Suggestion API...");
       try {
-        // We gebruiken de Suggestion API met postcode en gemeente bias voor Merksplas
         const response = await fetch(`https://geo.api.vlaanderen.be/geolocation/v4/Suggestion?q=${straatQuery} ${postcode} ${gemeente}&c=10`);
         const data = await response.json();
-        console.log("Straten API response:", data);
-
-        // Oude lijst leegmaken
+        
         streetList.innerHTML = "";
 
         if (data.SuggestionResult && data.SuggestionResult.length > 0) {
-          console.log(`${data.SuggestionResult.length} straten gevonden. Lijst opbouwen.`);
-          
-          // Resultaat is: "Kerkstraat 2, 2330 Merksplas". We splitsen op de komma en trimmen.
+          // Haal de straten uit de API, filter de unieke namen eruit
           const gevondenStraten = data.SuggestionResult.map(res => res.split(',')[0].trim());
-          const uniekeStraten = [...new Set(gevondenStraten)];
+          toegestaneStraten = [...new Set(gevondenStraten)];
 
-          uniekeStraten.forEach(straatnaam => {
+          toegestaneStraten.forEach(straatnaam => {
             if (straatnaam) {
               const li = document.createElement("li");
-              
               const button = document.createElement("button");
               button.type = "button";
               button.className = "dropdown-item text-start w-100";
               button.textContent = straatnaam;
               
-              // Event als iemand op een straat klikt
+              // Als iemand klikt op een dropdown-item:
               button.addEventListener("click", () => {
-                console.log(`Straat geselecteerd: ${straatnaam}. Veld invullen en dropdown sluiten.`);
                 straatInput.value = straatnaam;
+                toegestaneStraten = [straatnaam]; // Maak deze direct 100% geldig
+                validateForm(); // Controleer alles en maak het randje groen
                 hideDropdown();
               });
 
@@ -91,27 +155,22 @@ document.addEventListener("DOMContentLoaded", () => {
               streetList.appendChild(li);
             }
           });
-          
-          // Dropdown tonen
           dropdownContainer.style.display = "block";
         } else {
-          console.log("Geen straten gevonden voor deze zoekopdracht.");
           hideDropdown();
         }
       } catch (error) {
-        console.error("Fout bij ophalen straten via API:", error);
+        console.error(error);
         hideDropdown();
       }
     } else {
-       // Lijst verbergen als niet aan voorwaarden voldaan is
        hideDropdown();
     }
+    validateForm(); // Hertest het formulier bij elke getypte letter
   });
 
-  // 3. Verberg de lijst als de gebruiker ergens anders op het scherm klikt
   document.addEventListener("click", (e) => {
     if (!straatInput.contains(e.target) && !dropdownContainer.contains(e.target)) {
-      console.log("Klik buiten dropdown. Lijst sluiten.");
       hideDropdown();
     }
   });
