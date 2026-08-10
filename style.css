@@ -264,3 +264,10 @@ footer {
 .notFound a:hover {
     color: black;
 }
+/* Maak readonly velden (zoals gemeente) duidelijk onbruikbaar */
+input#gemeente[readonly] {
+    background-color: #e2e3e5 !important;
+    color: #6c757d !important;
+    cursor: not-allowed;
+    pointer-events: none;
+}
