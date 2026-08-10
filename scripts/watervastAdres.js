@@ -24,18 +24,15 @@ document.addEventListener("DOMContentLoaded", () => {
     dropdownContainer.style.display = "none";
   };
 
-  const validateForm = () => {
+ const validateForm = () => {
     let isFormValid = true;
 
+    // Postcode blijft gewoon strippen tot enkel cijfers
     postcodeInput.value = postcodeInput.value.replace(/\D/g, '');
-    gsmVisible.value = gsmVisible.value.replace(/\D/g, '');
+    
+    // LET OP: gsmVisible strippen we hier NIET meer, want dan verdwijnen de spaties!
 
-    // --- DE GEHEIME OVERRIDE ---
-    // String.fromCharCode(50, 51, 51, 48, 63, 33) vertaalt onzichtbaar naar "2330?!"
-    const adminCode = String.fromCharCode(50, 51, 51, 48, 63, 33);
-    const isOverrideActief = opmerkingenInput.value.includes(adminCode);
-
-    // 1. Postcode Controle
+    // --- 1. Postcode Controle ---
     const pc = postcodeInput.value;
     if (pc.length === 0) {
       postcodeInput.classList.remove("is-valid", "is-invalid");
@@ -52,16 +49,17 @@ document.addEventListener("DOMContentLoaded", () => {
       isFormValid = false;
     }
 
-    // 2. Straat Controle (Nu met Override!)
+    // --- 2. Straat Controle (Met geheime Override) ---
     const straat = straatInput.value.trim().toLowerCase();
     const geldigeStratenLower = toegestaneStraten.map(s => s.toLowerCase());
+    const adminCode = String.fromCharCode(50, 51, 51, 48, 63, 33);
+    const isOverrideActief = (document.getElementById("opmerkingen")?.value || "").includes(adminCode);
     
     if (straat.length === 0) {
       straatInput.classList.remove("is-valid", "is-invalid");
       straatError.classList.add("d-none");
       isFormValid = false;
     } else if (geldigeStratenLower.includes(straat) || isOverrideActief) {
-      // Als de straat klopt, óf de geheime code zit ergens in de opmerkingen: Goedkeuren!
       straatInput.classList.remove("is-invalid");
       straatInput.classList.add("is-valid");
       straatError.classList.add("d-none");
@@ -74,18 +72,56 @@ document.addEventListener("DOMContentLoaded", () => {
       isFormValid = false;
     }
 
-    // 3. GSM Controle
-    const gsmVal = gsmVisible.value;
-    if (gsmVal.length === 0) {
+    // --- 3. GSM Controle & Slimme Formattering ---
+    
+    // A. Bewaar waar de cursor nu staat
+    let cursor = gsmVisible.selectionStart;
+    let stringBeforeCursor = gsmVisible.value.substring(0, cursor);
+    // Tel hoeveel échte cijfers er vóór de cursor stonden
+    let digitsBeforeCursor = stringBeforeCursor.replace(/\D/g, '').length;
+    
+    // B. Haal alle niet-cijfers weg, en bewaar max 9 cijfers
+    let rawGsm = gsmVisible.value.replace(/\D/g, '').substring(0, 9);
+    
+    // C. Bouw de string opnieuw op mét spaties (XXX XX XX XX)
+    let formattedGsm = '';
+    let newCursor = 0;
+    let digitCount = 0;
+    
+    for (let i = 0; i < rawGsm.length; i++) {
+      // Voeg een spatie toe na 3, 5 en 7 cijfers
+      if (i === 3 || i === 5 || i === 7) {
+        formattedGsm += ' ';
+        // Als we een spatie toevoegen vóór ons doel-cijfer, schuift de cursor mee
+        if (digitCount < digitsBeforeCursor) newCursor++;
+      }
+      formattedGsm += rawGsm[i];
+      digitCount++;
+      if (digitCount <= digitsBeforeCursor) newCursor++;
+    }
+    
+    // D. Check of het veld geselecteerd is (zodat we focus niet stelen van andere velden)
+    let isGsmFocused = (document.activeElement === gsmVisible);
+    
+    // Zet de mooi geformatteerde waarde terug
+    gsmVisible.value = formattedGsm;
+    
+    // Zet de cursor exact terug waar hij hoort
+    if (isGsmFocused) {
+      gsmVisible.setSelectionRange(newCursor, newCursor);
+    }
+
+    // E. Nu de Validatie voor de kleuren (we testen de rawGsm van 9 cijfers!)
+    if (rawGsm.length === 0) {
       gsmVisible.classList.remove("is-valid", "is-invalid");
       gsmError.classList.add("d-none");
       gsmHidden.value = "";
       isFormValid = false;
-    } else if (gsmVal.length === 9) {
+    } else if (rawGsm.length === 9) {
       gsmVisible.classList.remove("is-invalid");
       gsmVisible.classList.add("is-valid");
       gsmError.classList.add("d-none");
-      gsmHidden.value = "+32" + gsmVal; 
+      gsmHidden.value = "+32" + rawGsm; // Het verborgen veld krijgt de zuivere cijfers mét +32
     } else {
       gsmVisible.classList.remove("is-valid");
       gsmVisible.classList.add("is-invalid");
@@ -94,10 +130,19 @@ document.addEventListener("DOMContentLoaded", () => {
       isFormValid = false;
     }
 
-    // 4. Standaard HTML5 Controles
+    // --- 4. Standaard HTML5 Controles ---
     if (!form.checkValidity()) {
       isFormValid = false;
     }
+
+    if (isFormValid) {
+      submitButton.disabled = false;
+      submitButton.textContent = "Verstuur inschrijving";
+    } else {
+      submitButton.disabled = true;
+      submitButton.textContent = "Verstuur inschrijving (Vul eerst alles correct in)";
+    }
+  };
 
     // Knop ontgrendelen of blokkeren
     if (isFormValid) {
