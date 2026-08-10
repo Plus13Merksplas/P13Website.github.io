@@ -22,7 +22,6 @@
     <h2 class="mb-3">Inschrijven Plus 13 Merksplas</h2>
     <p class="mb-4">Vul onderstaand formulier in om je in te schrijven bij Plus 13 Merksplas.</p>
 
-    <!-- id="inschrijfForm" is belangrijk voor onze validatie -->
     <form id="inschrijfForm" method="POST"
       action="https://script.google.com/macros/s/AKfycbx-kLZCy-mK5kRjlL8hLy5-rzbLIagwwcJX_kFw550Ip3QeoIF2bc5HIAAzt4-vput8/exec"  data-redirect="bedankt.html">
 
@@ -49,8 +48,9 @@
         <div class="row">
           <div class="col-md-4 mb-3">
             <label for="postcode" class="form-label">Postcode:</label>
-            <!-- pattern en maxlength forceren 4 cijfers -->
             <input type="text" class="form-control" id="postcode" name="postcode" pattern="\d{4}" maxlength="4" inputmode="numeric" required>
+            <!-- Foutmelding postcode -->
+            <div id="postcodeError" class="text-danger small mt-1 d-none">Een postcode bevat 4 cijfers.</div>
           </div>
           <div class="col-md-8 mb-3">
             <label for="gemeente" class="form-label">Gemeente:</label>
@@ -65,6 +65,8 @@
             <div id="customStreetDropdown" class="dropdown-menu w-100 shadow" style="max-height: 250px; overflow-y: auto; display: none; position: absolute; z-index: 1000;">
               <ul class="list-unstyled mb-0" id="customStreetList"></ul>
             </div>
+            <!-- Foutmelding straat -->
+            <div id="straatError" class="text-danger small mt-1 d-none">Deze straat bestaat niet.</div>
           </div>
           
           <div class="col-md-3 mb-3">
@@ -79,16 +81,14 @@
         <input type="email" class="form-control" id="email" name="email" required>
       </div>
 
-      <!-- NIEUWE GSM OPLOSSING -->
       <div class="mb-3">
         <label for="gsm_visible" class="form-label">GSM-nummer:</label>
         <div class="input-group">
-          <!-- Visueel 'vast' +32 blokje -->
           <span class="input-group-text bg-light fw-bold" id="gsm-prefix">+32</span>
-          <!-- Enkel 9 cijfers toegestaan -->
           <input type="text" class="form-control" id="gsm_visible" placeholder="412 34 56 78" pattern="\d{9}" maxlength="9" inputmode="numeric" required>
         </div>
-        <!-- Dit verborgen veld is wat 'name="gsm"' meestuurt naar je script, inclusief de +32 -->
+        <!-- Foutmelding GSM -->
+        <div id="gsmError" class="text-danger small mt-1 d-none">Dit nummer is te kort.</div>
         <input type="hidden" id="gsm" name="gsm">
       </div>
 
@@ -126,7 +126,6 @@
         <textarea class="form-control" id="opmerkingen" name="opmerkingen" rows="4"></textarea>
       </div>
 
-      <!-- Knop start als disabled! -->
       <button type="submit" class="btn btn-primary w-100" id="submitButton" disabled>
         Verstuur inschrijving (Vul eerst alles correct in)
       </button>
