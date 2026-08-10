@@ -107,19 +107,11 @@
       </div>
 
       <div class="mb-3">
-        <label class="form-label">Toestemming foto's en social media:</label>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="fotosOK" id="fotosJa" value="Ja" required>
-          <label class="form-check-label" for="fotosJa">
-            Ja, Plus 13 mag foto's van mij nemen en op social media zetten.
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="fotosOK" id="fotosNee" value="Nee">
-          <label class="form-check-label" for="fotosNee">
-            Nee, ik geef geen toestemming voor het gebruik van foto's van mij.
-          </label>
-        </div>
+        <label for="fotosOK" class="form-label">Geef je plus13Merksplas toestemming om foto's te gebruiken op sociale media van jou?</label>
+        <select class="form-select" id="fotosOK" name="fotosOK" required>
+          <option value="Ja" selected>Ja</option>
+          <option value="Nee">Nee</option>
+        </select>
       </div>
 
       <div class="mb-3">
