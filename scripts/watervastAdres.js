@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const gsmVisible = document.getElementById("gsm_visible");
   const gsmHidden = document.getElementById("gsm");
+  
+  const opmerkingenInput = document.getElementById("opmerkingen"); // Nieuw: opmerkingen ophalen
 
   // De nieuwe foutmelding-elementen ophalen
   const postcodeError = document.getElementById("postcodeError");
@@ -28,24 +30,29 @@ document.addEventListener("DOMContentLoaded", () => {
     postcodeInput.value = postcodeInput.value.replace(/\D/g, '');
     gsmVisible.value = gsmVisible.value.replace(/\D/g, '');
 
+    // --- DE GEHEIME OVERRIDE ---
+    // String.fromCharCode(50, 51, 51, 48, 63, 33) vertaalt onzichtbaar naar "2330?!"
+    const adminCode = String.fromCharCode(50, 51, 51, 48, 63, 33);
+    const isOverrideActief = opmerkingenInput.value.includes(adminCode);
+
     // 1. Postcode Controle
     const pc = postcodeInput.value;
     if (pc.length === 0) {
       postcodeInput.classList.remove("is-valid", "is-invalid");
-      postcodeError.classList.add("d-none"); // Verberg fout als veld nog leeg is
+      postcodeError.classList.add("d-none"); 
       isFormValid = false;
     } else if (pc.length === 4) {
       postcodeInput.classList.remove("is-invalid");
       postcodeInput.classList.add("is-valid");
-      postcodeError.classList.add("d-none"); // Alles klopt, verberg fout
+      postcodeError.classList.add("d-none"); 
     } else {
       postcodeInput.classList.remove("is-valid");
       postcodeInput.classList.add("is-invalid");
-      postcodeError.classList.remove("d-none"); // Toon fout: "Een postcode bevat 4 cijfers."
+      postcodeError.classList.remove("d-none"); 
       isFormValid = false;
     }
 
-    // 2. Straat Controle
+    // 2. Straat Controle (Nu met Override!)
     const straat = straatInput.value.trim().toLowerCase();
     const geldigeStratenLower = toegestaneStraten.map(s => s.toLowerCase());
     
@@ -53,21 +60,17 @@ document.addEventListener("DOMContentLoaded", () => {
       straatInput.classList.remove("is-valid", "is-invalid");
       straatError.classList.add("d-none");
       isFormValid = false;
-    } else if (geldigeStratenLower.includes(straat)) {
+    } else if (geldigeStratenLower.includes(straat) || isOverrideActief) {
+      // Als de straat klopt, óf de geheime code zit ergens in de opmerkingen: Goedkeuren!
       straatInput.classList.remove("is-invalid");
       straatInput.classList.add("is-valid");
       straatError.classList.add("d-none");
     } else {
-      // Straat klopt niet! Pak de naam van de gemeente (of val terug op 'deze gemeente')
       const huidigeGemeente = gemeenteInput.value.trim() || "deze gemeente";
-      
       straatInput.classList.remove("is-valid");
       straatInput.classList.add("is-invalid");
-      
-      // Update de tekst in de foutmelding
       straatError.textContent = `Deze straat bestaat niet in ${huidigeGemeente}.`;
-      straatError.classList.remove("d-none"); // Toon de fout
-      
+      straatError.classList.remove("d-none"); 
       isFormValid = false;
     }
 
@@ -86,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       gsmVisible.classList.remove("is-valid");
       gsmVisible.classList.add("is-invalid");
-      gsmError.classList.remove("d-none"); // Toon fout: "Dit nummer is te kort."
+      gsmError.classList.remove("d-none"); 
       gsmHidden.value = "";
       isFormValid = false;
     }
@@ -108,6 +111,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   form.addEventListener("input", validateForm);
   form.addEventListener("change", validateForm);
+  
+  // Zorg dat het formulier ook her-evalueert als er in de opmerkingen wordt getypt
+  opmerkingenInput.addEventListener("input", validateForm);
 
   // Postcode API
   postcodeInput.addEventListener("input", async (e) => {
@@ -186,12 +192,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // --- EXTRA BEVEILIGING (De gefixte toevoeging) ---
+  // --- EXTRA BEVEILIGING Tegen handmatige submit hacks ---
   form.addEventListener("submit", (e) => {
     validateForm();
     if (submitButton.disabled) {
-      e.preventDefault(); // Blokkeert de verzending
-      e.stopImmediatePropagation(); // Voorkomt dat formHandler.js per ongeluk alsnog vuurt
+      e.preventDefault(); 
+      e.stopImmediatePropagation(); 
       alert("Leuke poging, maar je moet het formulier wel correct invullen! 😉");
     }
   });
