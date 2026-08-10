@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (submitButton) {
                 submitButton.disabled = true;
-                submitButton.textContent = 'Verzenden...';
+                submitButton.textContent = <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Gegevens veilig verwerken...;
             }
 
             const formData = new FormData(form);
