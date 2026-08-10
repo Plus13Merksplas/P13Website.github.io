@@ -19,11 +19,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let toegestaneStraten = [];
 
   const hideDropdown = () => {
-    dropdownContainer.style.display = "none";
+    if (dropdownContainer) dropdownContainer.style.display = "none";
   };
 
   // --- De Dwangarbeider voor het GSM Veld ---
-  if(gsmVisible) {
+  if (gsmVisible) {
     gsmVisible.addEventListener("input", function(e) {
       let cursorPosition = this.selectionStart;
       let unformattedBeforeCursor = this.value.substring(0, cursorPosition).replace(/\D/g, '');
@@ -54,8 +54,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (postcodeInput) postcodeInput.value = postcodeInput.value.replace(/\D/g, '');
 
+    // Geheime Override (code "2330?!")
     const adminCode = String.fromCharCode(50, 51, 51, 48, 63, 33);
-    const isOverrideActief = (opmerkingenInput?.value || "").includes(adminCode);
+    const isOverrideActief = opmerkingenInput ? opmerkingenInput.value.includes(adminCode) : false;
 
     // 1. Postcode
     if (postcodeInput) {
@@ -83,18 +84,18 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if (straat.length === 0) {
         straatInput.classList.remove("is-valid", "is-invalid");
-        if(straatError) straatError.classList.add("d-none");
+        if (straatError) straatError.classList.add("d-none");
         isFormValid = false;
       } else if (geldigeStratenLower.includes(straat) || isOverrideActief) {
         straatInput.classList.remove("is-invalid");
         straatInput.classList.add("is-valid");
-        if(straatError) straatError.classList.add("d-none");
+        if (straatError) straatError.classList.add("d-none");
       } else {
-        const huidigeGemeente = gemeenteInput ? gemeenteInput.value.trim() : "deze gemeente";
+        const huidigeGemeente = gemeenteInput && gemeenteInput.value.trim() !== "" ? gemeenteInput.value.trim() : "deze gemeente";
         straatInput.classList.remove("is-valid");
         straatInput.classList.add("is-invalid");
-        if(straatError) {
-            straatError.textContent = `Deze straat bestaat niet in ${huidigeGemeente || 'deze gemeente'}.`;
+        if (straatError) {
+            straatError.textContent = `Deze straat bestaat niet in ${huidigeGemeente}.`;
             straatError.classList.remove("d-none"); 
         }
         isFormValid = false;
@@ -106,18 +107,18 @@ document.addEventListener("DOMContentLoaded", () => {
       const rawGsm = gsmVisible.value.replace(/\D/g, '');
       if (rawGsm.length === 0) {
         gsmVisible.classList.remove("is-valid", "is-invalid");
-        if(gsmError) gsmError.classList.add("d-none");
+        if (gsmError) gsmError.classList.add("d-none");
         gsmHidden.value = "";
         isFormValid = false;
       } else if (rawGsm.length === 9) {
         gsmVisible.classList.remove("is-invalid");
         gsmVisible.classList.add("is-valid");
-        if(gsmError) gsmError.classList.add("d-none");
+        if (gsmError) gsmError.classList.add("d-none");
         gsmHidden.value = "+32" + rawGsm; 
       } else {
         gsmVisible.classList.remove("is-valid");
         gsmVisible.classList.add("is-invalid");
-        if(gsmError) gsmError.classList.remove("d-none"); 
+        if (gsmError) gsmError.classList.remove("d-none"); 
         gsmHidden.value = "";
         isFormValid = false;
       }
@@ -139,6 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  // Event listeners voor validatie
   if (form) {
     form.addEventListener("input", validateForm);
     form.addEventListener("change", validateForm);
@@ -179,7 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const response = await fetch(`https://geo.api.vlaanderen.be/geolocation/v4/Suggestion?q=${straatQuery} ${postcode} ${gemeente}&c=10`);
           const data = await response.json();
           
-          if(streetList) streetList.innerHTML = "";
+          if (streetList) streetList.innerHTML = "";
 
           if (data.SuggestionResult && data.SuggestionResult.length > 0) {
             const gevondenStraten = data.SuggestionResult.map(res => res.split(',')[0].trim());
@@ -204,7 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 streetList.appendChild(li);
               }
             });
-            if(dropdownContainer) dropdownContainer.style.display = "block";
+            if (dropdownContainer) dropdownContainer.style.display = "block";
           } else {
             hideDropdown();
           }
@@ -219,12 +221,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Klik ergens anders = verberg dropdown
   document.addEventListener("click", (e) => {
     if (straatInput && dropdownContainer && !straatInput.contains(e.target) && !dropdownContainer.contains(e.target)) {
       hideDropdown();
     }
   });
 
+  // Beveiliging tegen handmatig submitten
   if (form) {
     form.addEventListener("submit", (e) => {
       validateForm();
@@ -236,11 +240,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- DE GOOGLE RECAPTCHA TROLL (Veilige Bootstrap 5 versie) ---
+  // --- DE GOOGLE RECAPTCHA TROLL ---
   const fotosSelect = document.getElementById("fotosOK");
   const captchaModalEl = document.getElementById("captchaModal");
   let isCaptchaPassed = false;
 
+  // Maak de callback bereikbaar voor Google
   window.reCaptchaGelukt = function() {
     isCaptchaPassed = true;
     setTimeout(() => {
@@ -250,25 +255,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 800);
   };
 
+  // Luister naar de Keuzelijst (Dropdown)
   if (fotosSelect) {
     fotosSelect.addEventListener("change", function() {
       if (this.value === "Nee") {
         isCaptchaPassed = false;
         
+        // Reset Google Captcha indien aanwezig
         if (typeof grecaptcha !== 'undefined') {
           grecaptcha.reset();
         }
         
-        // Dwing de modal om direct te openen
+        // Open de Modal via Bootstrap
         if (typeof bootstrap !== 'undefined' && captchaModalEl) {
           bootstrap.Modal.getOrCreateInstance(captchaModalEl).show();
         } else {
-          console.error("Bootstrap of de modal is niet geladen!");
+          console.error("Bootstrap is niet geladen, modal kan niet openen.");
         }
       }
     });
   }
 
+  // Straf indien pop-up gesloten wordt zonder succes
   if (captchaModalEl) {
     captchaModalEl.addEventListener("hide.bs.modal", function() {
       if (!isCaptchaPassed && fotosSelect) {
@@ -276,3 +284,4 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+});
