@@ -78,6 +78,8 @@
     align-items: center;
     gap: 10px;
   }
+  .name-row input[type="text"] { flex: 1.4; }
+  .name-row input[type="tel"] { flex: 1; min-width: 130px; }
   .name-row span {
     font-size: 12px;
     color: var(--muted);
@@ -157,16 +159,15 @@
     </div>
 
     <div class="field">
-      <label>Naam of namen</label>
-      <div class="names-list" id="namesList"></div>
+      <div class="checkbox-row">
+        <input id="phoneToggle" type="checkbox">
+        <label for="phoneToggle">Telefoonnummer per persoon toevoegen</label>
+      </div>
     </div>
 
     <div class="field">
-      <div class="checkbox-row">
-        <input id="phoneToggle" type="checkbox">
-        <label for="phoneToggle">Telefoonnummer tonen in handtekening</label>
-      </div>
-      <input id="phoneInput" type="tel" placeholder="+32 000 00 00 00" disabled style="opacity:0.5">
+      <label>Naam of namen</label>
+      <div class="names-list" id="namesList"></div>
     </div>
 
     <button id="replacePageBtn" type="button">Ga naar kopieerpagina</button>
@@ -184,13 +185,7 @@
           <td style="border-left:solid #00c0ff 2px" width="20"></td>
           <td style="vertical-align:top;text-align:left;color:#000000;font-size:12px;font-family:helvetica, arial">
             <span id="functionTitle" style="display:block;color:#00c0ff;font-size:16px;font-weight:bold;font-family:helvetica, arial;margin-bottom:2px">Functie</span>
-            <span id="namesBlock" style="display:block;color:#000000;font-size:13.5px;font-weight:500;font-family:helvetica, arial;line-height:1.5">Naam</span>
-            <span id="phoneRow" style="font:12px helvetica, arial;display:none;margin-top:4px">
-              <a id="phoneHref" href="tel:+3200000000" style="color:#000000;font-weight:500;text-decoration:none;display:flex;align-items:center;gap:4px">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00c0ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                <span id="phoneText">+32 000 00 00 00</span>
-              </a>
-            </span>
+            <span id="namesBlock" style="display:block;color:#000000;font-size:13.5px;font-family:helvetica, arial;line-height:1.4">Naam</span>
             <br>
             <b>
               <span style="margin-right:10px;color:#00c0ff;font-size:15px;font-family:helvetica, arial">
@@ -242,25 +237,40 @@
   const countInput = document.getElementById('countInput');
   const namesList = document.getElementById('namesList');
   const phoneToggle = document.getElementById('phoneToggle');
-  const phoneInput = document.getElementById('phoneInput');
 
   const functionTitle = document.getElementById('functionTitle');
   const namesBlock = document.getElementById('namesBlock');
-  const phoneRow = document.getElementById('phoneRow');
-  const phoneText = document.getElementById('phoneText');
-  const phoneHref = document.getElementById('phoneHref');
   const htmlCode = document.getElementById('htmlCode');
 
+  const PHONE_ICON = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00c0ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
   function buildNameInputs(count) {
-    const current = Array.from(namesList.querySelectorAll('input')).map(i => i.value);
+    const showPhone = phoneToggle.checked;
+    const rows = Array.from(namesList.querySelectorAll('.name-row'));
+    const current = rows.map(r => ({
+      name: r.querySelector('[data-name-input]')?.value || '',
+      phone: r.querySelector('[data-phone-input]')?.value || ''
+    }));
     namesList.innerHTML = '';
     for (let i = 0; i < count; i++) {
       const row = document.createElement('div');
       row.className = 'name-row';
-      row.innerHTML = `<span>${i + 1}.</span><input type="text" placeholder="Naam ${i + 1}" data-name-input>`;
-      const input = row.querySelector('input');
-      input.value = current[i] || '';
-      input.addEventListener('input', render);
+      row.innerHTML = `<span>${i + 1}.</span><input type="text" placeholder="Naam ${i + 1}" data-name-input>` +
+        (showPhone ? `<input type="tel" placeholder="Telefoon ${i + 1}" data-phone-input>` : '');
+      const nameEl = row.querySelector('[data-name-input]');
+      nameEl.value = current[i]?.name || '';
+      nameEl.addEventListener('input', render);
+      if (showPhone) {
+        const phoneEl = row.querySelector('[data-phone-input]');
+        phoneEl.value = current[i]?.phone || '';
+        phoneEl.addEventListener('input', render);
+      }
       namesList.appendChild(row);
     }
   }
@@ -281,22 +291,25 @@
     // Function title
     functionTitle.textContent = functionInput.value.trim() || 'Functie';
 
-    // Names list
-    const names = Array.from(namesList.querySelectorAll('input'))
-      .map(i => i.value.trim())
-      .filter(v => v.length > 0);
-    if (names.length === 0) names.push('Naam');
-    namesBlock.innerHTML = names.join('<br>');
+    // People (name + optional phone)
+    const showPhone = phoneToggle.checked;
+    let people = Array.from(namesList.querySelectorAll('.name-row')).map(r => ({
+      name: r.querySelector('[data-name-input]').value.trim(),
+      phone: showPhone ? (r.querySelector('[data-phone-input]')?.value.trim() || '') : ''
+    })).filter(p => p.name.length > 0);
+    if (people.length === 0) people = [{ name: 'Naam', phone: '' }];
 
-    // Phone
-    if (phoneToggle.checked) {
-      phoneRow.style.display = 'block';
-      const val = phoneInput.value.trim() || '+32 000 00 00 00';
-      phoneText.textContent = val;
-      phoneHref.href = 'tel:' + (phoneInput.value.trim() || '+3200000000');
-    } else {
-      phoneRow.style.display = 'none';
-    }
+    namesBlock.innerHTML = people.map((p, idx) => {
+      const isLast = idx === people.length - 1;
+      const nameMargin = showPhone ? '2px' : (isLast ? '0' : '6px');
+      let html = `<span style="display:block;font-weight:500;margin-bottom:${nameMargin}">${escapeHtml(p.name)}</span>`;
+      if (showPhone) {
+        const phoneVal = p.phone || '+32 000 00 00 00';
+        const telHref = 'tel:' + (p.phone || '+3200000000');
+        html += `<a href="${telHref}" style="color:#000000;font-weight:500;text-decoration:none;display:flex;align-items:center;gap:4px;margin-bottom:${isLast ? '0' : '6px'}">${PHONE_ICON}<span>${escapeHtml(phoneVal)}</span></a>`;
+      }
+      return html;
+    }).join('');
 
     updateHtmlBox();
   }
@@ -307,13 +320,11 @@
   }
 
   phoneToggle.addEventListener('change', () => {
-    phoneInput.disabled = !phoneToggle.checked;
-    phoneInput.style.opacity = phoneToggle.checked ? '1' : '0.5';
+    buildNameInputs(getCount());
     render();
   });
 
   functionInput.addEventListener('input', render);
-  phoneInput.addEventListener('input', render);
 
   document.getElementById('replacePageBtn').addEventListener('click', (e) => {
     e.preventDefault();
