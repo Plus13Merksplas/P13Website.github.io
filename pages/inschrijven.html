@@ -12,8 +12,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="icon" type="image/x-icon" href="../img/favicon.ico" />
   <link rel="stylesheet" href="../style.css">
-  <!-- Google reCAPTCHA Script -->
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 
 <body class="d-flex flex-column min-vh-100">
@@ -108,11 +106,12 @@
         </select>
       </div>
 
-      <!-- Aangepaste Fototoestemming met dropdown -->
+      <!-- Fototoestemming: geen vooraf ingevulde keuze meer -->
       <div class="mb-3">
         <label for="fotosOK" class="form-label">Geef je plus13Merksplas toestemming om foto's te gebruiken op sociale media van jou?</label>
         <select class="form-select" id="fotosOK" name="fotosOK" required>
-          <option value="Ja" selected>Ja</option>
+          <option value="" selected disabled>Kies een optie</option>
+          <option value="Ja">Ja</option>
           <option value="Nee">Nee</option>
         </select>
       </div>
@@ -128,23 +127,16 @@
       <div id="responseMessage" class="mt-3" style="display: none;"></div>
     </form>
 
-    <!-- De Echte Google reCAPTCHA Modal (Verborgen tot ze Nee klikken) -->
-    <div class="modal fade" id="captchaModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="captchaModalLabel" aria-hidden="true">
+    <!-- Bevestigingspopup bij "Nee" op fototoestemming -->
+    <div class="modal fade" id="fotoConfirmModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="fotoConfirmModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-          <div class="modal-header bg-warning">
-            <h5 class="modal-title fw-bold" id="captchaModalLabel">Beveiliging 🤖</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
           <div class="modal-body text-center p-4">
-            <p class="mb-3">Weet je zeker dat je niet op de foto wilt? Bewijs dat je geen robot bent:</p>
-            
-            <!-- HET GOOGLE WIDGET MET JOUW EIGEN KEY -->
-            <div class="g-recaptcha d-inline-block" data-sitekey="6Lce-H4tAAAAAHQpfdnLQPpZWanj57t-sWJAV7z6" data-callback="reCaptchaGelukt"></div>
-
-          </div>
-          <div class="modal-footer justify-content-center">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Laat maar, zet maar op Ja!</button>
+            <p class="mb-4">Ben je zeker dat je ons geen toestemming geeft voor foto's te nemen? Dit maakt dat we je apart moeten nemen tijdens groepsfoto's en andere sfeervolle activiteiten.</p>
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+              <button type="button" class="btn btn-outline-secondary" id="fotoConfirmYes">Ik ben zeker</button>
+              <button type="button" class="btn btn-primary" id="fotoConfirmSwitch">Doe toch maar ja</button>
+            </div>
           </div>
         </div>
       </div>
@@ -164,6 +156,49 @@
   <script src="/scripts/loadNavbar.js"></script>
   <script src="../scripts/AdresAPI.js?v=2"></script>
   <script src="../scripts/formHandler.js"></script>
+
+  <!-- Bevestigingslogica fototoestemming: "Nee" moet even makkelijk zijn als "Ja" -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var form = document.getElementById('inschrijfForm');
+      var fotosSelect = document.getElementById('fotosOK');
+      var fotoModalEl = document.getElementById('fotoConfirmModal');
+      var fotoModal = new bootstrap.Modal(fotoModalEl);
+      var neeConfirmed = false;
+
+      // Capture phase: dit loopt vóór de submit-listener(s) in formHandler.js
+      form.addEventListener('submit', function (e) {
+        if (fotosSelect.value === 'Nee' && !neeConfirmed) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          fotoModal.show();
+        }
+      }, true);
+
+      document.getElementById('fotoConfirmYes').addEventListener('click', function () {
+        neeConfirmed = true;
+        fotoModal.hide();
+        if (form.requestSubmit) {
+          form.requestSubmit();
+        } else {
+          form.submit();
+        }
+      });
+
+      document.getElementById('fotoConfirmSwitch').addEventListener('click', function () {
+        fotosSelect.value = 'Ja';
+        fotoModal.hide();
+      });
+
+      // Als iemand na een bevestigde "Nee" toch terugschakelt naar "Ja",
+      // moet de bevestiging opnieuw gevraagd worden bij een volgende "Nee".
+      fotosSelect.addEventListener('change', function () {
+        if (fotosSelect.value !== 'Nee') {
+          neeConfirmed = false;
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>
