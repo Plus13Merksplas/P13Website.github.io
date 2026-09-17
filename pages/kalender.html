@@ -15,16 +15,24 @@
             scroll-margin-top: 90px;
         }
 
-        #kalender-lijst-wrapper {
-            background-color: transparent;
-            padding: 1rem 0; /* Padding is nu alleen verticaal nodig zonder de witte box */
+        /* Overschrijf de info-box styling zodat de witte kader rond de titel verdwijnt */
+        #kalender-tab .info-box {
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
         }
 
-        /* Maand headers: Kleur aangepast naar de huisstijl teal/blauw */
+        #kalender-lijst-wrapper {
+            background-color: transparent;
+            padding: 1rem 0;
+        }
+
+        /* Maand headers: Dieper donkerblauw */
         .maand-kop {
-            color: #007b8f; 
+            color: #003f66; /* Donkerder blauw */
             font-weight: bold;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             border-bottom: 2px solid #add8e6;
             padding-bottom: 0.4rem;
             margin-top: 2rem;
@@ -35,17 +43,17 @@
             margin-top: 0;
         }
 
-        /* Harde border verwijderd, subtiel hover-effect toegevoegd, en accentlijn aan de linkerkant */
+        /* Subtiel hover-effect en donkerblauw accent */
         .event-rij {
             display: flex;
             align-items: stretch;
-            gap: 1rem;
+            gap: 1.5rem; /* Iets meer ruimte tussen datum en tekst */
             border-radius: 0.5rem;
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
             overflow: hidden;
             text-align: left;
             background-color: transparent;
-            border-left: 4px solid #007b8f; /* Accent lijn links ipv rondom */
+            border-left: 4px solid #003f66; /* Accent lijn in donkerblauw */
             transition: background-color 0.2s ease, box-shadow 0.2s ease;
         }
         
@@ -54,31 +62,33 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
-        /* Zwaar donker blok vervangen door lichte, open weergave in logokleur */
+        /* Datumblok met dag en afkorting */
         .event-datum {
-            color: #007b8f;
+            color: #003f66;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 0.75rem 1rem;
-            min-width: 72px;
+            min-width: 80px;
+        }
+
+        .event-datum .weekdag {
+            font-size: 1rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #6c757d;
+            margin-bottom: -2px; /* Dichter bij het getal */
         }
 
         .event-datum .dag {
-            font-size: 1.5rem;
-            font-weight: bold;
+            font-size: 2.2rem; /* Groter gemaakt */
+            font-weight: 900;
             line-height: 1;
         }
 
-        .event-datum .maand {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            color: #6c757d; /* Grijstint voor de maand zodat de dag meer opvalt */
-        }
-
         .event-inhoud {
-            padding: 0.75rem 1rem;
+            padding: 0.75rem 0;
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -86,12 +96,12 @@
         }
 
         .event-naam {
-            font-weight: bold;
+            font-weight: 800; /* Extra vet */
             color: #000;
-            font-size: 1.05rem;
+            font-size: 1.3rem; /* Groter */
+            margin-bottom: 0.25rem;
         }
 
-        /* Detail info met iconen flexibel geplaatst */
         .event-details-rij {
             display: flex;
             flex-wrap: wrap;
@@ -100,9 +110,9 @@
         }
 
         .event-uur {
-            color: #007b8f;
+            color: #003f66;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
         
         .event-uur i {
@@ -111,11 +121,11 @@
 
         .event-locatie {
             color: #6c757d;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
         }
         
         .event-locatie i {
-            color: #007b8f;
+            color: #003f66;
             margin-right: 5px;
         }
 
@@ -134,7 +144,8 @@
 
         <section id="kalender-tab" class="section-anchor mb-5">
             <div class="info-box p-4 mx-auto">
-                <h2 style="color: #007b8f; font-weight: bold;">Kalender</h2> <!-- Titel kleur toegevoegd -->
+                <!-- Donkerblauw, extra vet en groter gecentreerd -->
+                <h2 style="color: #003f66; font-weight: 900; font-size: 2.2rem; text-align: center;">Kalender</h2>
             </div>
         </section>
 
@@ -159,19 +170,6 @@
     <script>
         // =====================================================================
         // VUL HIER JE EIGEN GEGEVENS IN
-        // =====================================================================
-        // 1) GOOGLE_CALENDAR_ID: Google Agenda -> instellingen van je agenda ->
-        //    "Agenda integreren" -> "Agenda-id". Ziet er meestal uit als
-        //    "abcdef123456@group.calendar.google.com".
-        //    De agenda moet publiek toegankelijk staan: instellingen ->
-        //    "Toegangsrechten voor gebeurtenissen" -> "Openbaar maken".
-        //
-        // 2) GOOGLE_API_KEY: gratis aan te maken via
-        //    https://console.cloud.google.com/ -> nieuw project ->
-        //    "API's en services" -> "Bibliotheek" -> "Google Calendar API"
-        //    inschakelen -> "Inloggegevens" -> "Inloggegevens maken" ->
-        //    "API-sleutel". Beperk de sleutel nadien tot de Calendar API en
-        //    jouw domein.
         // =====================================================================
         const GOOGLE_CALENDAR_ID = "e32e360e0b3a31fbe8b49fc5e2928b901eb6ffe1deef7f2df7e0188889747eff@group.calendar.google.com";
         const GOOGLE_API_KEY = "AIzaSyA_5g89UhVrXLWzJIR8h8MgEi6loVCVPzw";
@@ -199,16 +197,16 @@
             const rij = document.createElement('div');
             rij.className = 'event-rij';
             
-            // Iconen toegevoegd voor tijd en locatie binnen de bestaande logica
+            // Layout met afkorting dag bovenaan, groot getal eronder. De dubbele tekst ernaast is weg!
             rij.innerHTML = `
                 <div class="event-datum">
+                    <span class="weekdag">${DAGEN_KORT[start.getDay()].toUpperCase()}</span>
                     <span class="dag">${start.getDate()}</span>
-                    <span class="maand">${MAANDEN[start.getMonth()].slice(0, 3)}</span>
                 </div>
                 <div class="event-inhoud">
                     <div class="event-naam">${event.summary || "(Naamloos evenement)"}</div>
                     <div class="event-details-rij">
-                        <div class="event-uur"><i class="fa-regular fa-clock"></i> ${DAGEN_KORT[start.getDay()]} ${start.getDate()} ${MAANDEN[start.getMonth()]} &middot; ${uurTekst}</div>
+                        <div class="event-uur"><i class="fa-regular fa-clock"></i> ${uurTekst}</div>
                         ${event.location ? `<div class="event-locatie"><i class="fa-solid fa-location-dot"></i> ${event.location}</div>` : ''}
                     </div>
                 </div>
