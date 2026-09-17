@@ -87,9 +87,17 @@
             font-size: 1.6rem;
         }
 
+        /* Container voor alle inhoud (standaard kolom voor mobiel) */
         .event-inhoud {
             padding: 0.75rem 0;
             flex: 1;
+            display: flex;
+            flex-direction: column; 
+            justify-content: center;
+        }
+
+        /* Groepeert titel, uur en locatie */
+        .event-hoofdinfo {
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -129,18 +137,40 @@
             margin-right: 5px;
         }
 
-        /* Nieuwe styling voor de beschrijving */
+        /* Standaard opmaak voor beschrijving (mobiel weergave) */
         .event-beschrijving {
-            margin-top: 0.5rem;
+            margin-top: 0.75rem; /* Afstand op mobiel als het eronder staat */
             font-size: 0.95rem;
-            color: #495057; /* Iets zachter dan puur zwart voor de leesbaarheid */
+            color: #495057;
             line-height: 1.5;
         }
 
-        /* Zorgt ervoor dat eventuele links in de beschrijving de logokleur krijgen */
         .event-beschrijving a {
             color: #003f66;
             text-decoration: underline;
+        }
+
+        /* =========================================================
+           RESPONSIVE DESIGN: Voor schermen breder dan tablets (768px)
+           ========================================================= */
+        @media (min-width: 768px) {
+            .event-inhoud {
+                flex-direction: row; /* Zet hoofdinfo en beschrijving naast elkaar */
+                align-items: center; /* Zorgt dat ze verticaal mooi in het midden staan */
+            }
+
+            .event-hoofdinfo {
+                flex: 0 0 35%; /* Neemt 35% van de breedte in */
+                min-width: 250px; /* Voorkomt dat het té smal wordt geknepen */
+            }
+
+            .event-beschrijving {
+                flex: 1; /* Vult de overige ruimte in de breedte op */
+                margin-top: 0; /* Verwijder de mobiele marge bovenaan */
+                padding-left: 1.5rem; /* Ruimte tussen de tekst en de scheidingslijn */
+                margin-left: 1rem; /* Afstand tussen het linker blok en de lijn */
+                border-left: 2px solid rgba(0, 63, 102, 0.15); /* Subtiel verticaal lijntje */
+            }
         }
 
         #kalender-status {
@@ -227,17 +257,20 @@
             const rij = document.createElement('div');
             rij.className = 'event-rij';
             
-            // De beschrijving wordt alleen toegevoegd als deze bestaat (event.description)
+            // HTML is lichtjes aangepast: 'event-hoofdinfo' groepeert nu de linkerkant,
+            // waardoor we de beschrijving er mooi naast kunnen zetten via CSS Flexbox.
             rij.innerHTML = `
                 <div class="event-datum">
                     <span class="weekdag">${weekdagTekst}</span>
                     <span class="${dagClass}">${datumTekst}</span>
                 </div>
                 <div class="event-inhoud">
-                    <div class="event-naam">${event.summary || "(Naamloos evenement)"}</div>
-                    <div class="event-details-rij">
-                        <div class="event-uur"><i class="fa-regular fa-clock"></i> ${uurTekst}</div>
-                        ${event.location ? `<div class="event-locatie"><i class="fa-solid fa-location-dot"></i> ${event.location}</div>` : ''}
+                    <div class="event-hoofdinfo">
+                        <div class="event-naam">${event.summary || "(Naamloos evenement)"}</div>
+                        <div class="event-details-rij">
+                            <div class="event-uur"><i class="fa-regular fa-clock"></i> ${uurTekst}</div>
+                            ${event.location ? `<div class="event-locatie"><i class="fa-solid fa-location-dot"></i> ${event.location}</div>` : ''}
+                        </div>
                     </div>
                     ${event.description ? `<div class="event-beschrijving">${event.description}</div>` : ''}
                 </div>
