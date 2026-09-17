@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8" />
+    <title>Kalender - Plus 13 Merksplas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="../img/favicon.ico" />
+    <link rel="stylesheet" href="../style.css">
+
+    <style>
+        .section-anchor {
+            scroll-margin-top: 90px;
+        }
+
+        #kalender-lijst-wrapper {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+        }
+
+        .maand-kop {
+            color: #222c34;
+            font-weight: bold;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #add8e6;
+            padding-bottom: 0.4rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .maand-kop:first-child {
+            margin-top: 0;
+        }
+
+        .event-rij {
+            display: flex;
+            align-items: stretch;
+            gap: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e3e3e3;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+            text-align: left;
+        }
+
+        .event-datum {
+            background-color: #222c34;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1rem;
+            min-width: 72px;
+        }
+
+        .event-datum .dag {
+            font-size: 1.5rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .event-datum .maand {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .event-inhoud {
+            padding: 0.75rem 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .event-naam {
+            font-weight: bold;
+            color: #000;
+            font-size: 1.05rem;
+        }
+
+        .event-uur {
+            color: #007b8f;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .event-locatie {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+
+        #kalender-status {
+            font-size: 0.95rem;
+            color: #6c757d;
+            text-align: center;
+            padding: 2rem 0;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <header id="nav-placeholder"></header>
+
+    <main class="container mt-5">
+
+        <section id="kalender-tab" class="section-anchor mb-5">
+            <div class="info-box p-4 mx-auto">
+                <h2>Kalender</h2>
+            </div>
+        </section>
+
+        <section class="mb-5">
+            <div id="kalender-lijst-wrapper">
+                <div id="kalender-status">Kalender wordt geladen...</div>
+                <div id="kalender-lijst"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="p-2 mt-3"> &copy; Plus13Merksplas
+        <a href="https://www.instagram.com/plus13merksplas" target="_blank" class="me-3 social"><i class="fab fa-instagram"></i></a>
+        <a href="https://www.facebook.com/plus13merksplas" target="_blank" class="me-3 social"><i class="fab fa-facebook"></i></a>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eJ7yQe5hF4yEw" crossorigin="anonymous"></script>
+    <script src="/scripts/loadNavbar.js"></script>
+
+    <script>
+        // =====================================================================
+        // VUL HIER JE EIGEN GEGEVENS IN
+        // =====================================================================
+        // 1) GOOGLE_CALENDAR_ID: Google Agenda -> instellingen van je agenda ->
+        //    "Agenda integreren" -> "Agenda-id". Ziet er meestal uit als
+        //    "abcdef123456@group.calendar.google.com".
+        //    De agenda moet publiek toegankelijk staan: instellingen ->
+        //    "Toegangsrechten voor gebeurtenissen" -> "Openbaar maken".
+        //
+        // 2) GOOGLE_API_KEY: gratis aan te maken via
+        //    https://console.cloud.google.com/ -> nieuw project ->
+        //    "API's en services" -> "Bibliotheek" -> "Google Calendar API"
+        //    inschakelen -> "Inloggegevens" -> "Inloggegevens maken" ->
+        //    "API-sleutel". Beperk de sleutel nadien tot de Calendar API en
+        //    jouw domein.
+        // =====================================================================
+        const GOOGLE_CALENDAR_ID = "e32e360e0b3a31fbe8b49fc5e2928b901eb6ffe1deef7f2df7e0188889747eff@group.calendar.google.com";
+        const GOOGLE_API_KEY = "AIzaSyA_5g89UhVrXLWzJIR8h8MgEi6loVCVPzw";
+
+        const MAANDEN = ["januari", "februari", "maart", "april", "mei", "juni",
+            "juli", "augustus", "september", "oktober", "november", "december"];
+        const DAGEN_KORT = ["zo", "ma", "di", "wo", "do", "vr", "za"];
+
+        function formatteerUur(datum) {
+            return datum.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function bouwEventRij(event) {
+            const isHeledag = !!event.start.date;
+            const start = new Date(event.start.dateTime || event.start.date);
+            const eind = new Date(event.end.dateTime || event.end.date);
+
+            let uurTekst;
+            if (isHeledag) {
+                uurTekst = "Hele dag";
+            } else {
+                uurTekst = `${formatteerUur(start)} - ${formatteerUur(eind)} uur`;
+            }
+
+            const rij = document.createElement('div');
+            rij.className = 'event-rij';
+            rij.innerHTML = `
+                <div class="event-datum">
+                    <span class="dag">${start.getDate()}</span>
+                    <span class="maand">${MAANDEN[start.getMonth()].slice(0, 3)}</span>
+                </div>
+                <div class="event-inhoud">
+                    <div class="event-naam">${event.summary || "(Naamloos evenement)"}</div>
+                    <div class="event-uur">${DAGEN_KORT[start.getDay()]} ${start.getDate()} ${MAANDEN[start.getMonth()]} &middot; ${uurTekst}</div>
+                    ${event.location ? `<div class="event-locatie"><i class="fa-solid fa-location-dot"></i> ${event.location}</div>` : ''}
+                </div>
+            `;
+            return rij;
+        }
+
+        async function laadKalender() {
+            const statusEl = document.getElementById('kalender-status');
+            const lijstEl = document.getElementById('kalender-lijst');
+
+            const nu = new Date();
+            const overEenJaar = new Date();
+            overEenJaar.setFullYear(nu.getFullYear() + 1);
+
+            const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(GOOGLE_CALENDAR_ID)}/events`
+                + `?key=${GOOGLE_API_KEY}`
+                + `&timeMin=${nu.toISOString()}`
+                + `&timeMax=${overEenJaar.toISOString()}`
+                + `&singleEvents=true`
+                + `&orderBy=startTime`
+                + `&maxResults=250`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`API antwoordde met status ${response.status}`);
+                const data = await response.json();
+
+                if (!data.items || data.items.length === 0) {
+                    statusEl.textContent = "Er staan momenteel geen activiteiten gepland.";
+                    return;
+                }
+
+                let huidigeMaandLabel = null;
+
+                data.items.forEach(event => {
+                    const start = new Date(event.start.dateTime || event.start.date);
+                    const maandLabel = `${MAANDEN[start.getMonth()]} ${start.getFullYear()}`;
+
+                    if (maandLabel !== huidigeMaandLabel) {
+                        const kop = document.createElement('div');
+                        kop.className = 'maand-kop';
+                        kop.textContent = maandLabel.charAt(0).toUpperCase() + maandLabel.slice(1);
+                        lijstEl.appendChild(kop);
+                        huidigeMaandLabel = maandLabel;
+                    }
+
+                    lijstEl.appendChild(bouwEventRij(event));
+                });
+
+                statusEl.style.display = 'none';
+            } catch (err) {
+                console.error(err);
+                statusEl.textContent = "De kalender kon niet geladen worden. Controleer de Calendar ID en API key, en of de agenda openbaar staat.";
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', laadKalender);
+    </script>
+</body>
+</html>
