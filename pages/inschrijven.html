@@ -154,10 +154,13 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eJ7yQe5hF4yEw" crossorigin="anonymous"></script>
   <script src="/scripts/loadNavbar.js"></script>
-  <script src="../scripts/AdresAPI.js?v=2"></script>
-  <script src="../scripts/formHandler.js"></script>
 
   <!-- Bevestigingslogica fototoestemming: "Nee" moet even makkelijk zijn als "Ja" -->
+  <!-- BELANGRIJK: dit script staat bewust VÓÓR AdresAPI.js en formHandler.js.
+       Meerdere 'submit'-listeners op hetzelfde element vuren af in de volgorde
+       waarin ze geregistreerd werden (capture/bubble maakt daarbij geen verschil
+       als het om hetzelfde element gaat). Als dit script na formHandler.js zou
+       staan, is de inschrijving al verstuurd vóór deze check ooit loopt. -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       var form = document.getElementById('inschrijfForm');
@@ -166,14 +169,13 @@
       var fotoModal = new bootstrap.Modal(fotoModalEl);
       var neeConfirmed = false;
 
-      // Capture phase: dit loopt vóór de submit-listener(s) in formHandler.js
       form.addEventListener('submit', function (e) {
         if (fotosSelect.value === 'Nee' && !neeConfirmed) {
           e.preventDefault();
           e.stopImmediatePropagation();
           fotoModal.show();
         }
-      }, true);
+      });
 
       document.getElementById('fotoConfirmYes').addEventListener('click', function () {
         neeConfirmed = true;
@@ -199,6 +201,9 @@
       });
     });
   </script>
+
+  <script src="../scripts/AdresAPI.js?v=2"></script>
+  <script src="../scripts/formHandler.js"></script>
 </body>
 
 </html>
