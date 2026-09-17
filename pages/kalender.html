@@ -15,7 +15,6 @@
             scroll-margin-top: 90px;
         }
 
-        /* Overschrijf de info-box styling zodat de witte kader rond de titel verdwijnt */
         #kalender-tab .info-box {
             background-color: transparent !important;
             border: none !important;
@@ -28,9 +27,8 @@
             padding: 1rem 0;
         }
 
-        /* Maand headers: Dieper donkerblauw */
         .maand-kop {
-            color: #003f66; /* Donkerder blauw */
+            color: #003f66;
             font-weight: bold;
             font-size: 1.4rem;
             border-bottom: 2px solid #add8e6;
@@ -43,17 +41,16 @@
             margin-top: 0;
         }
 
-        /* Subtiel hover-effect en donkerblauw accent */
         .event-rij {
             display: flex;
             align-items: stretch;
-            gap: 1.5rem; /* Iets meer ruimte tussen datum en tekst */
+            gap: 1.5rem;
             border-radius: 0.5rem;
             margin-bottom: 1rem;
             overflow: hidden;
             text-align: left;
             background-color: transparent;
-            border-left: 4px solid #003f66; /* Accent lijn in donkerblauw */
+            border-left: 4px solid #003f66;
             transition: background-color 0.2s ease, box-shadow 0.2s ease;
         }
         
@@ -62,7 +59,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
-        /* Datumblok met dag en afkorting */
+        /* min-width iets verhoogd zodat '12-14' er netjes in past */
         .event-datum {
             color: #003f66;
             display: flex;
@@ -70,7 +67,7 @@
             align-items: center;
             justify-content: center;
             padding: 0.75rem 1rem;
-            min-width: 80px;
+            min-width: 90px; 
         }
 
         .event-datum .weekdag {
@@ -78,13 +75,18 @@
             text-transform: uppercase;
             font-weight: bold;
             color: #6c757d;
-            margin-bottom: -2px; /* Dichter bij het getal */
+            margin-bottom: -2px;
         }
 
         .event-datum .dag {
-            font-size: 2.2rem; /* Groter gemaakt */
+            font-size: 2.2rem;
             font-weight: 900;
             line-height: 1;
+        }
+
+        /* Als het meerdere dagen is, maken we het font iets kleiner zodat 12-14 past */
+        .event-datum .dag.multi {
+            font-size: 1.6rem;
         }
 
         .event-inhoud {
@@ -96,9 +98,9 @@
         }
 
         .event-naam {
-            font-weight: 800; /* Extra vet */
+            font-weight: 800;
             color: #000;
-            font-size: 1.3rem; /* Groter */
+            font-size: 1.3rem;
             margin-bottom: 0.25rem;
         }
 
@@ -144,7 +146,6 @@
 
         <section id="kalender-tab" class="section-anchor mb-5">
             <div class="info-box p-4 mx-auto">
-                <!-- Donkerblauw, extra vet en groter gecentreerd -->
                 <h2 style="color: #003f66; font-weight: 900; font-size: 2.2rem; text-align: center;">Kalender</h2>
             </div>
         </section>
@@ -168,9 +169,6 @@
     <script src="/scripts/loadNavbar.js"></script>
 
     <script>
-        // =====================================================================
-        // VUL HIER JE EIGEN GEGEVENS IN
-        // =====================================================================
         const GOOGLE_CALENDAR_ID = "e32e360e0b3a31fbe8b49fc5e2928b901eb6ffe1deef7f2df7e0188889747eff@group.calendar.google.com";
         const GOOGLE_API_KEY = "AIzaSyA_5g89UhVrXLWzJIR8h8MgEi6loVCVPzw";
 
@@ -183,25 +181,50 @@
         }
 
         function bouwEventRij(event) {
-            const isHeledag = !!event.start.date;
+            const isHeledag = !!event.start.date && !event.start.dateTime;
             const start = new Date(event.start.dateTime || event.start.date);
-            const eind = new Date(event.end.dateTime || event.end.date);
+            let eind = new Date(event.end.dateTime || event.end.date);
 
-            let uurTekst;
+            // Google Agenda stuurt voor 'hele dag' evenementen de dag ERNÁ als einddatum.
+            // Voorbeeld: Vrijdag tot Zondag -> Einddatum is in de API eigenlijk de Maandag. 
+            // We trekken er 1 dag (24 uur) af zodat hij correct stopt op de zondag in onze code.
             if (isHeledag) {
-                uurTekst = "Hele dag";
+                eind = new Date(eind.getTime() - (24 * 60 * 60 * 1000));
+            }
+
+            // Check of het evenement op dezelfde dag start en eindigt
+            const isZelfdeDag = start.getFullYear() === eind.getFullYear() &&
+                                start.getMonth() === eind.getMonth() &&
+                                start.getDate() === eind.getDate();
+
+            let weekdagTekst, datumTekst, uurTekst, dagClass;
+
+            // Logica: is het 1 dag of meerdere dagen?
+            if (isZelfdeDag) {
+                weekdagTekst = DAGEN_KORT[start.getDay()].toUpperCase();
+                datumTekst = start.getDate();
+                dagClass = "dag"; // Normale, grote lettergrootte
+                uurTekst = isHeledag ? "Hele dag" : `${formatteerUur(start)} - ${formatteerUur(eind)} uur`;
             } else {
-                uurTekst = `${formatteerUur(start)} - ${formatteerUur(eind)} uur`;
+                weekdagTekst = DAGEN_KORT[start.getDay()].toUpperCase() + "-" + DAGEN_KORT[eind.getDay()].toUpperCase();
+                datumTekst = start.getDate() + "-" + eind.getDate();
+                dagClass = "dag multi"; // Iets kleinere lettergrootte via CSS
+                
+                // Bij meerdere dagen de uren correct weergeven (als die er zijn)
+                if (isHeledag) {
+                    uurTekst = "Meerdere dagen";
+                } else {
+                    uurTekst = `${DAGEN_KORT[start.getDay()]} ${formatteerUur(start)} - ${DAGEN_KORT[eind.getDay()]} ${formatteerUur(eind)}`;
+                }
             }
 
             const rij = document.createElement('div');
             rij.className = 'event-rij';
             
-            // Layout met afkorting dag bovenaan, groot getal eronder. De dubbele tekst ernaast is weg!
             rij.innerHTML = `
                 <div class="event-datum">
-                    <span class="weekdag">${DAGEN_KORT[start.getDay()].toUpperCase()}</span>
-                    <span class="dag">${start.getDate()}</span>
+                    <span class="weekdag">${weekdagTekst}</span>
+                    <span class="${dagClass}">${datumTekst}</span>
                 </div>
                 <div class="event-inhoud">
                     <div class="event-naam">${event.summary || "(Naamloos evenement)"}</div>
