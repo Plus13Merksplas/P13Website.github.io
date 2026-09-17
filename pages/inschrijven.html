@@ -160,45 +160,73 @@
        Meerdere 'submit'-listeners op hetzelfde element vuren af in de volgorde
        waarin ze geregistreerd werden (capture/bubble maakt daarbij geen verschil
        als het om hetzelfde element gaat). Als dit script na formHandler.js zou
-       staan, is de inschrijving al verstuurd vóór deze check ooit loopt. -->
+       staan, is de inschrijving al verstuurd vóór deze check ooit loopt.
+       De popup wordt met pure CSS getoond/verborgen (geen bootstrap.Modal JS-API):
+       als bootstrap.bundle.min.js om wat voor reden dan ook niet laadt, mag dat
+       dit script niet stilzwijgend laten crashen vóór de submit-listener actief is. -->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       var form = document.getElementById('inschrijfForm');
       var fotosSelect = document.getElementById('fotosOK');
       var fotoModalEl = document.getElementById('fotoConfirmModal');
-      var fotoModal = new bootstrap.Modal(fotoModalEl);
       var neeConfirmed = false;
 
-      form.addEventListener('submit', function (e) {
-        if (fotosSelect.value === 'Nee' && !neeConfirmed) {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          fotoModal.show();
-        }
-      });
+      function toonPopup() {
+        if (!fotoModalEl) return;
+        fotoModalEl.classList.add('show');
+        fotoModalEl.style.display = 'block';
+        fotoModalEl.style.backgroundColor = 'rgba(0,0,0,0.6)';
+        fotoModalEl.setAttribute('aria-hidden', 'false');
+      }
 
-      document.getElementById('fotoConfirmYes').addEventListener('click', function () {
-        neeConfirmed = true;
-        fotoModal.hide();
-        if (form.requestSubmit) {
-          form.requestSubmit();
-        } else {
-          form.submit();
-        }
-      });
+      function verbergPopup() {
+        if (!fotoModalEl) return;
+        fotoModalEl.classList.remove('show');
+        fotoModalEl.style.display = 'none';
+        fotoModalEl.style.backgroundColor = 'transparent';
+        fotoModalEl.setAttribute('aria-hidden', 'true');
+      }
 
-      document.getElementById('fotoConfirmSwitch').addEventListener('click', function () {
-        fotosSelect.value = 'Ja';
-        fotoModal.hide();
-      });
+      if (form && fotosSelect) {
+        form.addEventListener('submit', function (e) {
+          if (fotosSelect.value === 'Nee' && !neeConfirmed) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            toonPopup();
+          }
+        });
+      }
+
+      var jaKnop = document.getElementById('fotoConfirmYes');
+      if (jaKnop) {
+        jaKnop.addEventListener('click', function () {
+          neeConfirmed = true;
+          verbergPopup();
+          if (form.requestSubmit) {
+            form.requestSubmit();
+          } else {
+            form.submit();
+          }
+        });
+      }
+
+      var switchKnop = document.getElementById('fotoConfirmSwitch');
+      if (switchKnop) {
+        switchKnop.addEventListener('click', function () {
+          if (fotosSelect) fotosSelect.value = 'Ja';
+          verbergPopup();
+        });
+      }
 
       // Als iemand na een bevestigde "Nee" toch terugschakelt naar "Ja",
       // moet de bevestiging opnieuw gevraagd worden bij een volgende "Nee".
-      fotosSelect.addEventListener('change', function () {
-        if (fotosSelect.value !== 'Nee') {
-          neeConfirmed = false;
-        }
-      });
+      if (fotosSelect) {
+        fotosSelect.addEventListener('change', function () {
+          if (fotosSelect.value !== 'Nee') {
+            neeConfirmed = false;
+          }
+        });
+      }
     });
   </script>
 
