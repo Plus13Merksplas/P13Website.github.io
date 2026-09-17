@@ -59,7 +59,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
-        /* min-width iets verhoogd zodat '12-14' er netjes in past */
         .event-datum {
             color: #003f66;
             display: flex;
@@ -84,7 +83,6 @@
             line-height: 1;
         }
 
-        /* Als het meerdere dagen is, maken we het font iets kleiner zodat 12-14 past */
         .event-datum .dag.multi {
             font-size: 1.6rem;
         }
@@ -129,6 +127,20 @@
         .event-locatie i {
             color: #003f66;
             margin-right: 5px;
+        }
+
+        /* Nieuwe styling voor de beschrijving */
+        .event-beschrijving {
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+            color: #495057; /* Iets zachter dan puur zwart voor de leesbaarheid */
+            line-height: 1.5;
+        }
+
+        /* Zorgt ervoor dat eventuele links in de beschrijving de logokleur krijgen */
+        .event-beschrijving a {
+            color: #003f66;
+            text-decoration: underline;
         }
 
         #kalender-status {
@@ -185,32 +197,26 @@
             const start = new Date(event.start.dateTime || event.start.date);
             let eind = new Date(event.end.dateTime || event.end.date);
 
-            // Google Agenda stuurt voor 'hele dag' evenementen de dag ERNÁ als einddatum.
-            // Voorbeeld: Vrijdag tot Zondag -> Einddatum is in de API eigenlijk de Maandag. 
-            // We trekken er 1 dag (24 uur) af zodat hij correct stopt op de zondag in onze code.
             if (isHeledag) {
                 eind = new Date(eind.getTime() - (24 * 60 * 60 * 1000));
             }
 
-            // Check of het evenement op dezelfde dag start en eindigt
             const isZelfdeDag = start.getFullYear() === eind.getFullYear() &&
                                 start.getMonth() === eind.getMonth() &&
                                 start.getDate() === eind.getDate();
 
             let weekdagTekst, datumTekst, uurTekst, dagClass;
 
-            // Logica: is het 1 dag of meerdere dagen?
             if (isZelfdeDag) {
                 weekdagTekst = DAGEN_KORT[start.getDay()].toUpperCase();
                 datumTekst = start.getDate();
-                dagClass = "dag"; // Normale, grote lettergrootte
+                dagClass = "dag"; 
                 uurTekst = isHeledag ? "Hele dag" : `${formatteerUur(start)} - ${formatteerUur(eind)} uur`;
             } else {
                 weekdagTekst = DAGEN_KORT[start.getDay()].toUpperCase() + "-" + DAGEN_KORT[eind.getDay()].toUpperCase();
                 datumTekst = start.getDate() + "-" + eind.getDate();
-                dagClass = "dag multi"; // Iets kleinere lettergrootte via CSS
+                dagClass = "dag multi"; 
                 
-                // Bij meerdere dagen de uren correct weergeven (als die er zijn)
                 if (isHeledag) {
                     uurTekst = "Meerdere dagen";
                 } else {
@@ -221,6 +227,7 @@
             const rij = document.createElement('div');
             rij.className = 'event-rij';
             
+            // De beschrijving wordt alleen toegevoegd als deze bestaat (event.description)
             rij.innerHTML = `
                 <div class="event-datum">
                     <span class="weekdag">${weekdagTekst}</span>
@@ -232,6 +239,7 @@
                         <div class="event-uur"><i class="fa-regular fa-clock"></i> ${uurTekst}</div>
                         ${event.location ? `<div class="event-locatie"><i class="fa-solid fa-location-dot"></i> ${event.location}</div>` : ''}
                     </div>
+                    ${event.description ? `<div class="event-beschrijving">${event.description}</div>` : ''}
                 </div>
             `;
             return rij;
