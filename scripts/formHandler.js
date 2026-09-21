@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitButton = document.getElementById('submitButton');
     const originalButtonText = submitButton ? submitButton.textContent : 'Verstuur inschrijving (Vul eerst alles correct in)';
 
+    // Eén unieke ID per pagina-laadbeurt, gebruikt door Apps Script om dubbele
+    // verzendingen (bv. door een netwerk-/CORS-hikje) te herkennen en te negeren.
+    const submissionId = crypto.randomUUID();
+
     if (form) {
         form.addEventListener('submit', function(event) {
             // DIT IS CRUCIAAL: Dit voorkomt dat je naar die lelijke zwarte Google pagina gaat
@@ -16,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             const formData = new FormData(form);
+            formData.append('submissionId', submissionId);
 
             // Validatie geboortedatum (indien het veld bestaat en ingevuld is)
             const geboortedatum = formData.get('geboortedatum');
