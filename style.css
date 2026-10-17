@@ -270,5 +270,20 @@ input#gemeente[readonly] {
     color: #6c757d !important;
     cursor: not-allowed;
     pointer-events: none;
+
+.foto-thumb {
+    cursor: pointer;
 }
-.bgl-thumb { cursor: zoom-in; }
+
+/* Plaatshouder terwijl de foto laadt */
+.firebase-image-loading {
+    background-color: rgba(128, 128, 128, 0.2);
+    min-height: 150px;
+}
+
+/* Foto kon niet geladen worden */
+.firebase-image-error {
+    opacity: 0.5;
+    cursor: default;
+}
+
