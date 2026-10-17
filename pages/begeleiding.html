@@ -22,8 +22,11 @@
         <div class="row justify-content-center">
             
             <div class="bgl-box col-12 col-md-10 col-lg-6 mt-5 mx-auto p-3 d-flex flex-column flex-md-row">
-                <p class="col-12 col-md-6 mt-auto mb-auto">Begeleiding groep 1: <br> Quinten Julia Toon</p>
-                <img src="../img/begeleiding/GROEP1.jpg" alt="bgl Groep 1" class="col-12 col-md-6 rounded">
+                <p class="col-12 col-md-6 mt-auto mb-auto">Begeleiding groep 1: <br> Ute, Toon en Robbe</p>
+                <img
+                    id="groep1-foto"
+                    alt="bgl Groep 1"
+                    class="col-12 col-md-6 rounded">
             </div>
 
             <div class="bgl-box col-12 col-md-10 col-lg-6 mt-5 mx-auto p-3 d-flex flex-column flex-md-row">
@@ -62,6 +65,18 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eJ7yQe5hF4yEw" crossorigin="anonymous"></script>
     <script src="/scripts/loadNavbar.js"></script>
+    <script type="module">
+
+        import { loadImage }
+        from "../scripts/firebaseImages.js";
+
+        loadImage(
+            "BGL foto's",
+            "Groep1.JPG",
+            "groep1-foto"
+);
+
+</script>
 </body>
 
 </html>
