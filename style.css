@@ -270,6 +270,7 @@ input#gemeente[readonly] {
     color: #6c757d !important;
     cursor: not-allowed;
     pointer-events: none;
+}
 
 .foto-thumb {
     cursor: pointer;
@@ -286,4 +287,3 @@ input#gemeente[readonly] {
     opacity: 0.5;
     cursor: default;
 }
-
