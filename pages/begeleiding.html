@@ -20,8 +20,7 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-    <header id="nav-placeholder">
-    </header>
+    <header id="nav-placeholder"></header>
 
     <main class="container">
         <div class="row justify-content-center">
@@ -30,48 +29,48 @@
                 <p class="col-12 col-md-6 mt-auto mb-auto">
                     Begeleiding groep 1: <br> Ute, Toon en Robbe
                 </p>
-                <img id="groep1-foto" data-bgl-image="Groep1.webp" data-bgl-thumbnail="true"
-                    alt="bgl Groep 1" class="bgl-thumb col-12 col-md-6 rounded">
+                <img data-album="BGL" data-foto="Groep1.webp"
+                    alt="Begeleiding groep 1" class="foto-thumb col-12 col-md-6 rounded">
             </div>
 
             <div class="bgl-box col-12 col-md-10 col-lg-6 mt-5 mx-auto p-3 d-flex flex-column flex-md-row">
                 <p class="col-12 col-md-6 mt-auto mb-auto">
                     Begeleiding groep 2: <br> Lennerd, Loïs en Lukas
                 </p>
-                <img id="groep2-foto" data-bgl-image="Groep2.webp" data-bgl-thumbnail="true"
-                    alt="bgl Groep 2" class="bgl-thumb col-12 col-md-6 rounded">
+                <img data-album="BGL" data-foto="Groep2.webp"
+                    alt="Begeleiding groep 2" class="foto-thumb col-12 col-md-6 rounded">
             </div>
 
             <div class="bgl-box col-12 col-md-10 col-lg-6 mt-5 mx-auto p-3 d-flex flex-column flex-md-row">
                 <p class="col-12 col-md-6 mt-auto mb-auto">
                     Begeleiding groep 3: <br> Soetkin en Cas
                 </p>
-                <img id="groep3-foto" data-bgl-image="Groep3.webp" data-bgl-thumbnail="true"
-                    alt="bgl Groep 3" class="bgl-thumb col-12 col-md-6 rounded">
+                <img data-album="BGL" data-foto="Groep3.webp"
+                    alt="Begeleiding groep 3" class="foto-thumb col-12 col-md-6 rounded">
             </div>
 
             <div class="bgl-box col-12 col-md-10 col-lg-6 mt-5 mx-auto p-3 d-flex flex-column flex-md-row">
                 <p class="col-12 col-md-6 mt-auto mb-auto">
                     Begeleiding groep 4: <br> Rik en Joris
                 </p>
-                <img id="groep4-foto" data-bgl-image="Groep4.webp" data-bgl-thumbnail="true"
-                    alt="bgl Groep 4" class="bgl-thumb col-12 col-md-6 rounded">
+                <img data-album="BGL" data-foto="Groep4.webp"
+                    alt="Begeleiding groep 4" class="foto-thumb col-12 col-md-6 rounded">
             </div>
 
             <div class="bgl-box col-12 col-md-10 col-lg-6 mt-5 mx-auto p-3 d-flex flex-column flex-md-row">
                 <p class="col-12 col-md-6 mt-auto mb-auto">
                     Begeleiding groep 5: <br> Helena en Warre
                 </p>
-                <img id="groep5-foto" data-bgl-image="Groep5.webp" data-bgl-thumbnail="true"
-                    alt="bgl Groep 5" class="bgl-thumb col-12 col-md-6 rounded">
+                <img data-album="BGL" data-foto="Groep5.webp"
+                    alt="Begeleiding groep 5" class="foto-thumb col-12 col-md-6 rounded">
             </div>
 
             <div class="bgl-box col-12 col-md-10 col-lg-6 mt-5 mx-auto p-3 d-flex flex-column flex-md-row">
                 <p class="col-12 col-md-6 mt-auto mb-auto">
                     Begeleiding groep 6: <br> Julia en Quinten
                 </p>
-                <img id="groep6-foto" data-bgl-image="Groep6.webp" data-bgl-thumbnail="true"
-                    alt="bgl Groep 6" class="bgl-thumb col-12 col-md-6 rounded">
+                <img data-album="BGL" data-foto="Groep6.webp"
+                    alt="Begeleiding groep 6" class="foto-thumb col-12 col-md-6 rounded">
             </div>
 
         </div>
@@ -80,57 +79,23 @@
     <footer class="p-2 mt-3">
         &copy; Plus13Merksplas
 
-        <a href="https://www.instagram.com/plus13merksplas"
-            target="_blank"
-            class="me-3 social">
+        <a href="https://www.instagram.com/plus13merksplas" target="_blank" class="me-3 social">
             <i class="fab fa-instagram"></i>
         </a>
 
-        <a href="https://www.facebook.com/plus13merksplas"
-            target="_blank"
-            class="me-3 social">
+        <a href="https://www.facebook.com/plus13merksplas" target="_blank" class="me-3 social">
             <i class="fab fa-facebook"></i>
         </a>
     </footer>
-
-    <!-- Modal voor de normale foto -->
-    <div class="modal fade" id="bglModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
-            <div class="modal-content bg-transparent border-0">
-                <div class="modal-body p-0 text-center position-relative">
-                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3"
-                        data-bs-dismiss="modal" aria-label="Sluiten"></button>
-                    <img id="bgl-modal-img" alt="" class="img-fluid rounded">
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
 
-    <script src="/scripts/loadNavbar.js"></script>
+    <script src="../scripts/loadNavbar.js"></script>
 
-    <script type="module">
-        import { loadAllBglImages, loadBglImage } from "../scripts/firebaseImages.js";
-
-        // Alle thumbnails laden
-        loadAllBglImages();
-
-        // Klik op een thumbnail: de normale foto in een modal tonen
-        const modal = new bootstrap.Modal(document.getElementById("bglModal"));
-        const modalImg = document.getElementById("bgl-modal-img");
-
-        document.querySelectorAll("img[data-bgl-image]").forEach(img => {
-            img.addEventListener("click", () => {
-                modalImg.removeAttribute("src"); // geen vorige foto laten zien
-                modalImg.alt = img.alt;
-                modal.show();
-                loadBglImage(img.dataset.bglImage, "bgl-modal-img", false);
-            });
-        });
-    </script>
+    <!-- Laadt alle thumbnails en regelt de klik-om-te-vergroten -->
+    <script type="module" src="../scripts/fotos.js"></script>
 </body>
 
 </html>
