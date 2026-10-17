@@ -23,35 +23,32 @@
             
             <div class="bgl-box col-12 col-md-10 col-lg-6 mt-5 mx-auto p-3 d-flex flex-column flex-md-row">
                 <p class="col-12 col-md-6 mt-auto mb-auto">Begeleiding groep 1: <br> Ute, Toon en Robbe</p>
-                <img
-                    id="groep1-foto"
-                    alt="bgl Groep 1"
-                    class="col-12 col-md-6 rounded">
+                <img id="groep1-foto" alt="bgl Groep 1" class="col-12 col-md-6 rounded">
             </div>
 
             <div class="bgl-box col-12 col-md-10 col-lg-6 mt-5 mx-auto p-3 d-flex flex-column flex-md-row">
                 <p class="col-12 col-md-6 mt-auto mb-auto">Begeleiding groep 2: <br> Warre Lars Robbe</p>
-                <img src="../img/begeleiding/GROEP2.jpg" alt="bgl Groep 2" class="col-12 col-md-6 rounded">
+                <img id="groep2-foto" alt="bgl Groep 2" class="col-12 col-md-6 rounded">
             </div>
 
             <div class="bgl-box col-12 col-md-10 col-lg-6 mt-5 mx-auto p-3 d-flex flex-column flex-md-row">
                 <p class="col-12 col-md-6 mt-auto mb-auto">Begeleiding groep 3: <br> Cas Stijn Lukas</p>
-                <img src="../img/begeleiding/GROEP3.jpg" alt="bgl Groep 3" class="col-12 col-md-6 rounded">
+                <img id="groep3-foto" alt="bgl Groep 3" class="col-12 col-md-6 rounded">
             </div>
 
             <div class="bgl-box col-12 col-md-10 col-lg-6 mt-5 mx-auto p-3 d-flex flex-column flex-md-row">
                 <p class="col-12 col-md-6 mt-auto mb-auto">Begeleiding groep 4: <br> Lennerd Rik Stef</p>
-                <img src="../img/begeleiding/GROEP4.jpg" alt="bgl Groep 4" class="col-12 col-md-6 rounded">
+                <img id="groep4-foto" alt="bgl Groep 4" class="col-12 col-md-6 rounded">
             </div>
 
             <div class="bgl-box col-12 col-md-10 col-lg-6 mt-5 mx-auto p-3 d-flex flex-column flex-md-row">
                 <p class="col-12 col-md-6 mt-auto mb-auto">Begeleiding groep 5: <br> Ylke Helena Wout</p>
-                <img src="../img/begeleiding/GROEP5.jpg" alt="bgl Groep 5" class="col-12 col-md-6 rounded">
+                <img id="groep5-foto" alt="bgl Groep 5" class="col-12 col-md-6 rounded">
             </div>
 
             <div class="bgl-box col-12 col-md-10 col-lg-6 mt-5 mx-auto p-3 d-flex flex-column flex-md-row">
                 <p class="col-12 col-md-6 mt-auto mb-auto">Begeleiding groep 6: <br> Soetkin Berre</p>
-                <img src="../img/begeleiding/GROEP6.jpg" alt="bgl Groep 6" class="col-12 col-md-6 rounded">
+                <img id="groep6-foto" alt="bgl Groep 6" class="col-12 col-md-6 rounded">
             </div>
         </div>
     </main>
@@ -70,11 +67,12 @@
         import { loadImage }
         from "../scripts/firebaseImages.js";
 
-        loadImage(
-            "BGL foto's",
-            "Groep1.JPG",
-            "groep1-foto"
-);
+        loadImage ("BGL foto's","Groep1.JPG","groep1-foto");
+        loadImage ("BGL foto's","Groep2.JPG","groep2-foto");
+        loadImage ("BGL foto's","Groep3.JPG","groep3-foto");
+        loadImage ("BGL foto's","Groep4.JPG","groep4-foto");
+        loadImage ("BGL foto's","Groep5.JPG","groep5-foto");
+        loadImage ("BGL foto's","Groep6.JPG","groep6-foto");
 
 </script>
 </body>
