@@ -271,3 +271,4 @@ input#gemeente[readonly] {
     cursor: not-allowed;
     pointer-events: none;
 }
+.bgl-thumb { cursor: zoom-in; }
