@@ -1,4 +1,4 @@
-import { loadImage, getImageUrl } from "./firebaseImages.js";
+import { getImageUrl } from "./firebaseImages.js";
 
 let modal = null;
 let modalImage = null;
@@ -94,13 +94,66 @@ function ensureModal() {
 }
 
 
+/*
+ * Toont één foto in twee stappen:
+ *   1. de thumbnail (staat al in het geheugen) meteen, uitvergroot;
+ *   2. de grote versie op de achtergrond laden en ertussen wisselen zodra ze klaar is.
+ */
+function toonFoto(thumbnail) {
+    const url = getImageUrl(thumbnail.dataset.album, thumbnail.dataset.foto, false);
+    const thumbKlaar = thumbnail.complete && thumbnail.naturalWidth > 0;
+
+    // Onthoud welke foto nu gevraagd is, zodat een trage oudere foto nooit een nieuwere overschrijft.
+    modalImage.dataset.requested = url;
+    modalImage.alt = thumbnail.alt;
+    modalImage.classList.remove("firebase-image-error");
+
+    // Het formaat volgt uit de thumbnail (zelfde verhouding als de grote foto).
+    // Zo vult de thumbnail dezelfde plek als later de grote foto en springt er niets.
+    if (thumbKlaar) {
+        const verhouding = thumbnail.naturalWidth / thumbnail.naturalHeight;
+        modalImage.style.aspectRatio = `${thumbnail.naturalWidth} / ${thumbnail.naturalHeight}`;
+        modalImage.style.width = `min(100%, ${(90 * verhouding).toFixed(2)}vh)`;
+    } else {
+        modalImage.style.aspectRatio = "";
+        modalImage.style.width = "";
+    }
+
+    const groot = new Image();
+
+    const toonGrote = () => {
+        if (modalImage.dataset.requested === url) {
+            modalImage.src = url;
+        }
+    };
+
+    groot.onload = toonGrote;
+    groot.onerror = () => {
+        console.error(`Afbeelding kon niet geladen worden: ${url}`);
+
+        // Is er geen thumbnail om op terug te vallen, dan tonen we de foutstijl.
+        if (modalImage.dataset.requested === url && !thumbKlaar) {
+            modalImage.classList.add("firebase-image-error");
+            modalImage.alt = "Afbeelding kon niet geladen worden";
+        }
+    };
+    groot.src = url;
+
+    if (groot.complete && groot.naturalWidth > 0) {
+        toonGrote();                      // al in de cache (bv. vooraf opgehaalde buurfoto)
+    } else if (thumbKlaar) {
+        modalImage.src = thumbnail.src;   // tijdelijk de thumbnail tonen
+    } else {
+        modalImage.removeAttribute("src");
+    }
+}
+
+
 // Toont foto nummer i van de groep. Na de laatste foto begin je weer bij de eerste.
 function toon(nieuweIndex) {
     index = (nieuweIndex + groep.length) % groep.length;
 
-    const thumbnail = groep[index];
-    modalImage.alt = thumbnail.alt;
-    loadImage(modalImage, thumbnail.dataset.album, thumbnail.dataset.foto, false);
+    toonFoto(groep[index]);
 
     teller.textContent = `${index + 1} / ${groep.length}`;
 
