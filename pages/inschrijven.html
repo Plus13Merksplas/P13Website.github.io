@@ -1,237 +1,223 @@
-<!doctype html>
-<html lang="nl">
+import { getImageUrl } from "./firebaseImages.js";
 
-<head>
-  <meta charset="UTF-8" />
-  <title>Inschrijven - Plus 13 Merksplas</title>
-  <meta name="author" content="Robbe Coeckelbergs" />
-  <meta name="description" content="Schrijf je in en geniet van mega toffe activiteiten met je vrienden." />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="icon" type="image/x-icon" href="../img/favicon.ico" />
-  <link rel="stylesheet" href="../style.css">
-</head>
+let modal = null;
+let modalImage = null;
+let teller = null;
+let vorigeKnop = null;
+let volgendeKnop = null;
 
-<body class="d-flex flex-column min-vh-100">
-  <header id="nav-placeholder">
-    </header>
+let groep = [];   // alle thumbnails van het album waarin je klikte
+let index = 0;    // welke foto nu getoond wordt
+let isOpen = false;
 
-  <main class="container mt-4">
-    <h2 class="mb-3">Inschrijven Plus 13 Merksplas</h2>
-    <p class="mb-4">Vul onderstaand formulier in om je in te schrijven bij Plus 13 Merksplas.</p>
+// Eigen stijl, omdat jouw style.css van elke .btn 100% breed maakt.
+const PIJL_STIJL = `
+    position:absolute; top:50%; transform:translateY(-50%); z-index:5;
+    width:44px; height:44px; border:0; border-radius:50%;
+    background:rgba(0,0,0,.55); color:#fff; font-size:2rem; line-height:1;
+    padding:0 0 4px 0; display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+`;
 
-    <form id="inschrijfForm" method="POST"
-      action="https://script.google.com/macros/s/AKfycbx-kLZCy-mK5kRjlL8hLy5-rzbLIagwwcJX_kFw550Ip3QeoIF2bc5HIAAzt4-vput8/exec"  data-redirect="bedankt.html">
 
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label for="voornaam" class="form-label">Voornaam:</label>
-          <input type="text" class="form-control" id="voornaam" name="voornaam" required>
-        </div>
-        <div class="col-md-6 mb-3">
-          <label for="achternaam" class="form-label">Achternaam:</label>
-          <input type="text" class="form-control" id="achternaam" name="achternaam" required>
-        </div>
-      </div>
+// De modal wordt pas gemaakt bij de eerste klik. Pagina's hoeven er dus geen HTML voor te hebben.
+function ensureModal() {
+    if (modal) return;
 
-      <div class="mb-3">
-        <label for="geboortedatum" class="form-label">Geboortedatum:</label>
-        <input type="text" class="form-control" id="geboortedatum" name="geboortedatum" placeholder="bv. 17/05/2006" required>
-        <small class="text-muted">Voer je geboortedatum in als dd/mm/jjjj</small>
-      </div>
+    const element = document.createElement("div");
+    element.className = "modal fade";
+    element.tabIndex = -1;
+    element.setAttribute("aria-hidden", "true");
+    element.innerHTML = `
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content bg-transparent border-0">
+                <div class="modal-body p-0 text-center position-relative">
+                    <button type="button"
+                            class="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+                            style="z-index:5"
+                            data-bs-dismiss="modal" aria-label="Sluiten"></button>
 
-      <fieldset class="mb-3 p-3 border rounded position-relative">
-        <legend class="float-none w-auto px-2 fs-5">Adresgegevens</legend>
-        
-        <div class="row">
-          <div class="col-md-4 mb-3">
-            <label for="postcode" class="form-label">Postcode:</label>
-            <input type="text" class="form-control" id="postcode" name="postcode" pattern="\d{4}" maxlength="4" inputmode="numeric" required>
-            <!-- Foutmelding postcode -->
-            <div id="postcodeError" class="text-danger small mt-1 d-none">Een postcode bevat 4 cijfers.</div>
-          </div>
-          <div class="col-md-8 mb-3">
-            <label for="gemeente" class="form-label">Gemeente:</label>
-            <input type="text" class="form-control" id="gemeente" name="gemeente" readonly required>
-          </div>
-        </div>
+                    <button type="button" class="lightbox-vorige" aria-label="Vorige foto"
+                            style="${PIJL_STIJL} left:.5rem">&#8249;</button>
+                    <button type="button" class="lightbox-volgende" aria-label="Volgende foto"
+                            style="${PIJL_STIJL} right:.5rem">&#8250;</button>
 
-        <div class="row">
-          <div class="col-md-9 mb-3 position-relative">
-            <label for="straat" class="form-label">Straat:</label>
-            <input type="text" class="form-control" id="straat" name="straat" autocomplete="off" required>
-            <div id="customStreetDropdown" class="dropdown-menu w-100 shadow" style="max-height: 250px; overflow-y: auto; display: none; position: absolute; z-index: 1000;">
-              <ul class="list-unstyled mb-0" id="customStreetList"></ul>
+                    <img alt="" class="img-fluid rounded" style="max-height:90vh">
+
+                    <span class="badge text-bg-dark position-absolute bottom-0 start-50 translate-middle-x mb-2"></span>
+                </div>
             </div>
-            <!-- Foutmelding straat -->
-            <div id="straatError" class="text-danger small mt-1 d-none">Deze straat bestaat niet.</div>
-          </div>
-          
-          <div class="col-md-3 mb-3">
-            <label for="nummer" class="form-label">Nummer:</label>
-            <input type="text" class="form-control" id="nummer" name="nummer" required>
-          </div>
         </div>
-      </fieldset>
+    `;
 
-      <div class="mb-3">
-        <label for="email" class="form-label">E-mailadres:</label>
-        <input type="email" class="form-control" id="email" name="email" required>
-      </div>
+    document.body.appendChild(element);
 
-      <div class="mb-3">
-        <label for="gsm_visible" class="form-label">GSM-nummer:</label>
-        <div class="input-group">
-          <span class="input-group-text bg-light fw-bold" id="gsm-prefix">+32</span>
-          <!-- Aangepast voor spaties: lengte 12, pattern met spaties -->
-          <input type="text" class="form-control" id="gsm_visible" placeholder="412 34 56 78" pattern="\d{3} \d{2} \d{2} \d{2}" maxlength="12" inputmode="numeric" required>
-        </div>
-        <!-- Foutmelding GSM -->
-        <div id="gsmError" class="text-danger small mt-1 d-none">Dit nummer is te kort.</div>
-        <input type="hidden" id="gsm" name="gsm">
-      </div>
+    modalImage = element.querySelector("img");
+    teller = element.querySelector(".badge");
+    vorigeKnop = element.querySelector(".lightbox-vorige");
+    volgendeKnop = element.querySelector(".lightbox-volgende");
+    modal = new bootstrap.Modal(element);
 
-      <div class="mb-3">
-        <label for="groep" class="form-label">In welke groep zit je?</label>
-        <select class="form-select" id="groep" name="groep" required>
-          <option value="">Kies je groep</option>
-          <option value="Groep 1">Groep 1</option>
-          <option value="Groep 2">Groep 2</option>
-          <option value="Groep 3">Groep 3</option>
-          <option value="Groep 4">Groep 4</option>
-          <option value="Groep 5">Groep 5</option>
-          <option value="Groep 6">Groep 6</option>
-        </select>
-      </div>
+    vorigeKnop.addEventListener("click", () => toon(index - 1));
+    volgendeKnop.addEventListener("click", () => toon(index + 1));
 
-      <!-- Fototoestemming: geen vooraf ingevulde keuze meer -->
-      <div class="mb-3">
-        <label for="fotosOK" class="form-label">Geef je plus13Merksplas toestemming om foto's te gebruiken op sociale media van jou?</label>
-        <select class="form-select" id="fotosOK" name="fotosOK" required>
-          <option value="" selected disabled>Kies een optie</option>
-          <option value="Ja">Ja</option>
-          <option value="Nee">Nee</option>
-        </select>
-      </div>
-
-      <div class="mb-3">
-        <label for="opmerkingen" class="form-label">Opmerkingen (allergieën, medische info, ...):</label>
-        <textarea class="form-control" id="opmerkingen" name="opmerkingen" rows="4"></textarea>
-      </div>
-
-      <button type="submit" class="btn btn-primary w-100" id="submitButton" disabled>
-        Verstuur inschrijving (Vul eerst alles correct in)
-      </button>
-      <div id="responseMessage" class="mt-3" style="display: none;"></div>
-    </form>
-
-    <!-- Bevestigingspopup bij "Nee" op fototoestemming -->
-    <div class="modal fade" id="fotoConfirmModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="fotoConfirmModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-          <div class="modal-body text-center p-4">
-            <p class="mb-4">Ben je zeker dat je ons geen toestemming geeft voor foto's te nemen? Dit maakt dat we je apart moeten nemen tijdens groepsfoto's en andere sfeervolle activiteiten.</p>
-            <div class="d-flex justify-content-center gap-2 flex-wrap">
-              <button type="button" class="btn btn-outline-secondary" id="fotoConfirmYes">Ik ben zeker</button>
-              <button type="button" class="btn btn-primary" id="fotoConfirmSwitch">Doe toch maar ja</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </main>
-
-  <footer class="p-2 mt-3">
-    &copy; Plus13Merksplas
-    <a href="https://www.instagram.com/plus13merksplas" target="_blank" class="me-3 social"><i
-        class="fab fa-instagram"></i></a>
-    <a href="https://www.facebook.com/plus13merksplas" target="_blank" class="me-3 social"><i
-        class="fab fa-facebook"></i></a>
-  </footer>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eJ7yQe5hF4yEw" crossorigin="anonymous"></script>
-  <script src="/scripts/loadNavbar.js"></script>
-
-  <!-- Bevestigingslogica fototoestemming: "Nee" moet even makkelijk zijn als "Ja" -->
-  <!-- BELANGRIJK: dit script staat bewust VÓÓR AdresAPI.js en formHandler.js.
-       Meerdere 'submit'-listeners op hetzelfde element vuren af in de volgorde
-       waarin ze geregistreerd werden (capture/bubble maakt daarbij geen verschil
-       als het om hetzelfde element gaat). Als dit script na formHandler.js zou
-       staan, is de inschrijving al verstuurd vóór deze check ooit loopt.
-       De popup wordt met pure CSS getoond/verborgen (geen bootstrap.Modal JS-API):
-       als bootstrap.bundle.min.js om wat voor reden dan ook niet laadt, mag dat
-       dit script niet stilzwijgend laten crashen vóór de submit-listener actief is. -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var form = document.getElementById('inschrijfForm');
-      var fotosSelect = document.getElementById('fotosOK');
-      var fotoModalEl = document.getElementById('fotoConfirmModal');
-      var neeConfirmed = false;
-
-      function toonPopup() {
-        if (!fotoModalEl) return;
-        fotoModalEl.classList.add('show');
-        fotoModalEl.style.display = 'block';
-        fotoModalEl.style.backgroundColor = 'rgba(0,0,0,0.6)';
-        fotoModalEl.setAttribute('aria-hidden', 'false');
-      }
-
-      function verbergPopup() {
-        if (!fotoModalEl) return;
-        fotoModalEl.classList.remove('show');
-        fotoModalEl.style.display = 'none';
-        fotoModalEl.style.backgroundColor = 'transparent';
-        fotoModalEl.setAttribute('aria-hidden', 'true');
-      }
-
-      if (form && fotosSelect) {
-        form.addEventListener('submit', function (e) {
-          if (fotosSelect.value === 'Nee' && !neeConfirmed) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            toonPopup();
-          }
-        });
-      }
-
-      var jaKnop = document.getElementById('fotoConfirmYes');
-      if (jaKnop) {
-        jaKnop.addEventListener('click', function () {
-          neeConfirmed = true;
-          verbergPopup();
-          if (form.requestSubmit) {
-            form.requestSubmit();
-          } else {
-            form.submit();
-          }
-        });
-      }
-
-      var switchKnop = document.getElementById('fotoConfirmSwitch');
-      if (switchKnop) {
-        switchKnop.addEventListener('click', function () {
-          if (fotosSelect) fotosSelect.value = 'Ja';
-          verbergPopup();
-        });
-      }
-
-      // Als iemand na een bevestigde "Nee" toch terugschakelt naar "Ja",
-      // moet de bevestiging opnieuw gevraagd worden bij een volgende "Nee".
-      if (fotosSelect) {
-        fotosSelect.addEventListener('change', function () {
-          if (fotosSelect.value !== 'Nee') {
-            neeConfirmed = false;
-          }
-        });
-      }
+    element.addEventListener("shown.bs.modal", () => { isOpen = true; });
+    element.addEventListener("hidden.bs.modal", () => {
+        isOpen = false;
+        modalImage.removeAttribute("src"); // volgende keer niet even de vorige foto tonen
     });
-  </script>
 
-  <script src="../scripts/AdresAPI.js?v=2"></script>
-  <script src="../scripts/formHandler.js"></script>
-</body>
+    // Pijltjestoetsen op het toetsenbord
+    document.addEventListener("keydown", event => {
+        if (!isOpen) return;
+        if (event.key === "ArrowLeft") toon(index - 1);
+        if (event.key === "ArrowRight") toon(index + 1);
+    });
 
-</html>
+    // Vegen op gsm
+    const body = element.querySelector(".modal-body");
+    let startX = null;
+
+    body.addEventListener("touchstart", event => {
+        startX = event.changedTouches[0].clientX;
+    }, { passive: true });
+
+    body.addEventListener("touchend", event => {
+        if (startX === null) return;
+        const verschil = event.changedTouches[0].clientX - startX;
+        startX = null;
+
+        if (Math.abs(verschil) > 50) {
+            toon(index + (verschil < 0 ? 1 : -1));
+        }
+    });
+}
+
+
+/*
+ * Toont één foto in twee stappen:
+ *   1. de thumbnail meteen, uitvergroot. Is die op de pagina nog niet geladen
+ *      (bv. omdat je er nog niet naartoe gescrold bent), dan halen we hem zelf op;
+ *   2. de grote versie op de achtergrond laden en ertussen wisselen zodra ze klaar is.
+ */
+function toonFoto(thumbnail) {
+    const { album, foto } = thumbnail.dataset;
+    const url = getImageUrl(album, foto, false);
+    const thumbUrl = getImageUrl(album, foto, true);
+
+    // Onthoud welke foto nu gevraagd is, zodat een trage oudere foto nooit een nieuwere overschrijft.
+    modalImage.dataset.requested = url;
+    modalImage.alt = thumbnail.alt;
+    modalImage.classList.remove("firebase-image-error");
+
+    const isHuidig = () => modalImage.dataset.requested === url;
+    let groteGetoond = false;
+    let thumbGetoond = false;
+
+    // Het formaat volgt uit de foto zelf, zodat thumbnail en grote foto dezelfde plek innemen.
+    const zetMaat = bron => {
+        const verhouding = bron.naturalWidth / bron.naturalHeight;
+        modalImage.style.aspectRatio = `${bron.naturalWidth} / ${bron.naturalHeight}`;
+        modalImage.style.width = `min(100%, ${(90 * verhouding).toFixed(2)}vh)`;
+    };
+
+    const toonThumb = bron => {
+        if (!isHuidig() || groteGetoond || !bron.naturalWidth) return;
+        thumbGetoond = true;
+        zetMaat(bron);
+        modalImage.src = thumbUrl;
+    };
+
+    const groot = new Image();
+
+    groot.onload = () => {
+        if (!isHuidig()) return;
+        groteGetoond = true;
+        zetMaat(groot);
+        modalImage.src = url;
+    };
+
+    groot.onerror = () => {
+        console.error(`Afbeelding kon niet geladen worden: ${url}`);
+
+        // Is er geen thumbnail om op terug te vallen, dan tonen we de foutstijl.
+        if (isHuidig() && !thumbGetoond) {
+            modalImage.classList.add("firebase-image-error");
+            modalImage.alt = "Afbeelding kon niet geladen worden";
+        }
+    };
+
+    groot.src = url;
+
+    // Al in de cache (bv. een vooraf opgehaalde buurfoto): meteen de grote tonen.
+    if (groot.complete && groot.naturalWidth > 0) {
+        groot.onload();
+        return;
+    }
+
+    if (thumbnail.complete && thumbnail.naturalWidth > 0) {
+        toonThumb(thumbnail);          // thumbnail staat al op de pagina
+    } else {
+        const kleine = new Image();    // thumbnail nog niet geladen: zelf ophalen
+        kleine.onload = () => toonThumb(kleine);
+        kleine.src = thumbUrl;
+    }
+}
+
+
+// Toont foto nummer i van de groep. Na de laatste foto begin je weer bij de eerste.
+function toon(nieuweIndex) {
+    index = (nieuweIndex + groep.length) % groep.length;
+
+    toonFoto(groep[index]);
+
+    teller.textContent = `${index + 1} / ${groep.length}`;
+
+    const metPijlen = groep.length > 1;
+    vorigeKnop.style.display = metPijlen ? "flex" : "none";
+    volgendeKnop.style.display = metPijlen ? "flex" : "none";
+    teller.style.display = metPijlen ? "" : "none";
+
+    // De volgende en vorige foto alvast ophalen, zodat bladeren snel gaat.
+    if (metPijlen) {
+        [index + 1, index - 1].forEach(i => {
+            const buur = groep[(i + groep.length) % groep.length];
+            new Image().src = getImageUrl(buur.dataset.album, buur.dataset.foto, false);
+        });
+    }
+}
+
+
+// Alle thumbnails van hetzelfde album, in de volgorde van de pagina.
+function verzamelGroep(thumbnail) {
+    return Array.from(document.querySelectorAll("img[data-album][data-foto]"))
+        .filter(img =>
+            img.dataset.album === thumbnail.dataset.album &&
+            !img.classList.contains("firebase-image-error")
+        );
+}
+
+
+/**
+ * Zet de lightbox aan voor de hele pagina.
+ *
+ * Werkt met event delegation: elke <img data-album data-foto> opent bij een
+ * klik de normale versie, ook als die pas later aan de pagina wordt toegevoegd.
+ */
+export function initLightbox() {
+    document.addEventListener("click", event => {
+        const thumbnail = event.target.closest("img[data-album][data-foto]");
+
+        if (!thumbnail || thumbnail.classList.contains("firebase-image-error")) {
+            return;
+        }
+
+        ensureModal();
+
+        groep = verzamelGroep(thumbnail);
+
+        modalImage.removeAttribute("src");
+        modal.show();
+        toon(groep.indexOf(thumbnail));
+    });
+}
