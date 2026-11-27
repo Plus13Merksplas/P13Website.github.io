@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Paspoortbureau admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;700&family=Courier+Prime:wght@400;700&family=Inter:wght@400;600&family=Special+Elite&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="band top">
+  <div><h1>Paspoortbureau · admin</h1>
+  <p>Hier bepaal je het ontwerp en de ledenlijst. Elke wijziging geldt meteen voor alle paspoorten, ook die al klaar zijn. De begeleiding werkt op <a href="./">de begeleidingspagina</a>.</p></div>
+  <div class="prog" aria-live="polite"><b id="pDone">0</b> <span id="pTot">/ 0 klaar</span><div class="bar"><i id="pBar"></i></div></div>
+</header>
+<p class="demo" id="demo" hidden>Demo-modus: er is nog geen Google-backend gekoppeld. Wat je hier doet, blijft enkel in deze browser.</p>
+<main>
+  <section class="band">
+    <h2 style="font-size:32px;margin-bottom:4px">Ontwerp</h2>
+    <p class="lead">Sleep het fotokader of een tekstveld om het te verplaatsen, sleep het gouden hoekje om de foto groter of kleiner te maken.</p>
+    <div class="design">
+      <div class="stage">
+        <canvas id="lcv" aria-label="Ontwerp van het paspoort"></canvas>
+        <div class="row" style="margin-top:10px"><label class="msg" for="prevSel">Voorbeeld met</label><select id="prevSel"></select></div>
+        <p class="saved" id="saved" aria-live="polite"></p>
+      </div>
+      <div>
+        <fieldset><legend>Achtergrond uit Krita</legend>
+          <label class="file">Achtergrond uploaden (PNG/JPG)<input type="file" id="bgFile" accept="image/png,image/jpeg"></label>
+          <p class="hint" id="bgHint"></p>
+          <div class="row" style="margin-top:8px"><button class="btn alt sm" id="bgFit" type="button" hidden>Afmetingen overnemen van afbeelding</button><button class="btn alt sm" id="bgDel" type="button" hidden>Achtergrond verwijderen</button></div>
+        </fieldset>
+        <fieldset><legend>Formaat paspoort (mm)</legend><div class="f" id="fSize"></div></fieldset>
+        <fieldset><legend>Fotokader (mm vanaf linksboven)</legend><div class="f" id="fPhoto"></div></fieldset>
+        <fieldset><legend>Tekstvelden (mm, grootte in pt)</legend><div id="fLines"></div><p class="hint">De y-waarde is de basislijn van de tekst. Te lange namen worden automatisch iets kleiner gezet.</p></fieldset>
+        <fieldset><legend>Letters en volgorde</legend><div class="f" id="fFont"></div>
+          <label class="hint" for="gOrder" style="display:block;margin-top:10px">Volgorde van de groepen (komma's), voor de lijst, de nummers en de PDF</label>
+          <input id="gOrder" data-k="groepsvolgorde" placeholder="bv. Rakkers, Toppers, Kerels" style="width:100%">
+        </fieldset>
+      </div>
+    </div>
+  </section>
+
+  <section class="band panel">
+    <h2>Ledenlijst</h2>
+    <p class="lead">Plak leden uit Excel of typ ze in: één per regel als <code>Groep;Voornaam;Achternaam</code> (of <code>Groep;Voornaam Achternaam</code>). De foto van elk lid heet in Drive <code>voornaam_achternaam.png</code>.</p>
+    <textarea id="mText" placeholder="Rakkers;Lotte;Peeters&#10;Rakkers;Wout;Janssens&#10;Toppers;Jules Wouters"></textarea>
+    <div class="row" style="margin:8px 0 18px"><button class="btn" id="mAdd" type="button">Toevoegen</button><span class="msg" id="mMsg"></span></div>
+    <div class="scroll"><table class="mt"><thead><tr><th>Groep</th><th>Voornaam</th><th>Achternaam</th><th>Status</th><th></th></tr></thead><tbody id="mBody"></tbody></table></div>
+  </section>
+
+  <section class="band panel">
+    <h2>Alle paspoorten</h2>
+    <p class="lead">Zo komen ze eruit met het huidige ontwerp (getoond met kleine voorbeeldfoto's; de PDF gebruikt de volledige foto's).</p>
+    <div class="grid" id="all"></div>
+  </section>
+
+  <section class="band panel">
+    <h2>PDF voor de drukker</h2>
+    <p class="lead" id="exInfo"></p>
+    <div class="row">
+      <select id="exMode" aria-label="Opmaak"><option value="a4">A4-vellen met snijtekens</option><option value="single">Eén paspoort per pagina</option></select>
+      <label class="row msg"><input type="checkbox" id="exDone" style="min-height:auto;width:18px;height:18px"> Enkel wie klaar is</label>
+      <button class="btn" id="exBtn" type="button">PDF maken</button>
+    </div>
+    <p class="msg" id="exMsg" style="margin-top:8px"></p>
+  </section>
+</main>
+<div class="ov" id="login" hidden><form class="sheet" id="loginForm">
+  <h2>Admin</h2><p class="sub">Geef de admincode.</p>
+  <input id="loginCode" type="password" autocomplete="current-password" aria-label="Admincode" required>
+  <button class="btn">Binnen</button><p class="msg" id="loginMsg"></p>
+</form></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="common.js"></script>
+<script src="admin.js"></script>
+</body></html>

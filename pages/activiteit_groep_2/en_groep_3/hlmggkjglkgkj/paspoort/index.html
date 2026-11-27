@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Paspoortbureau Plus13</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;700&family=Courier+Prime:wght@400;700&family=Inter:wght@400;600&family=Special+Elite&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head><body>
+<header class="band top">
+  <div><h1>Paspoortbureau</h1>
+  <p>Kies een lid, plak de foto (Ctrl+V of Cmd+V), schuif ze goed in het kader en vink <b>Klaar?</b> aan.</p></div>
+  <div class="prog" aria-live="polite"><b id="pDone">0</b> <span id="pTot">/ 0 klaar</span><div class="bar"><i id="pBar"></i></div></div>
+</header>
+<p class="demo" id="demo" hidden>Demo-modus: er is nog geen Google-backend gekoppeld. Wat je hier doet, blijft enkel in deze browser.</p>
+<main class="band work">
+  <aside class="side">
+    <div class="tools"><input id="q" type="search" placeholder="Zoek een naam" aria-label="Zoek een naam"><select id="grp" aria-label="Groep"><option value="">Alle groepen</option></select></div>
+    <p class="msg" id="status">Laden…</p>
+    <h2 class="lh">Te doen <span id="nTodo"></span></h2>
+    <ul class="mlist" id="todo"></ul>
+    <h2 class="lh">Klaar <span id="nDone"></span></h2>
+    <ul class="mlist" id="done"></ul>
+  </aside>
+  <section class="editor" aria-live="polite">
+    <p class="empty" id="edEmpty">Kies links een lid. Daarna kan je meteen een foto plakken of hierheen slepen.</p>
+    <div id="edBody" hidden>
+      <h2 id="eName"></h2><p class="sub" id="eGroup"></p>
+      <div class="drop" id="drop"><canvas id="pcv" aria-label="Voorbeeld van het paspoort"></canvas><p class="dropHint" id="dropHint">Plak een foto (Ctrl+V) of sleep ze hierheen</p></div>
+      <div class="row">
+        <button class="btn alt" id="pasteBtn" type="button">Foto plakken</button>
+        <label class="file">Bestand kiezen<input type="file" id="file" accept="image/*"></label>
+      </div>
+      <div class="zoom"><span>Zoom</span><input type="range" id="zoom" min="1" max="4" step="0.01" value="1" aria-label="Zoom"></div>
+      <p class="hint">Sleep in het fotokader om de foto te verschuiven.</p>
+      <label class="klaar"><input type="checkbox" id="klaar"> Klaar?</label>
+      <div class="row"><button class="btn" id="save" type="button">Opslaan</button><span class="msg" id="msg"></span></div>
+    </div>
+  </section>
+</main>
+<div class="ov" id="login" hidden><form class="sheet" id="loginForm">
+  <h2>Paspoortbureau</h2><p class="sub">Geef de code van de begeleiding.</p>
+  <input id="loginCode" type="password" autocomplete="current-password" aria-label="Code" required>
+  <button class="btn">Binnen</button><p class="msg" id="loginMsg"></p>
+</form></div>
+<script src="common.js"></script>
+<script src="begeleiding.js"></script>
+</body></html>
