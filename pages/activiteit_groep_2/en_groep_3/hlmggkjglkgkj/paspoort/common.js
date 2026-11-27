@@ -2,7 +2,7 @@
 'use strict';
 const PP = (() => {
   // ▼ Plak hier de URL van je Apps Script web-app (eindigt op /exec). Leeg laten = demo-modus.
-  const API_URL = '';
+  const API_URL = 'https://script.google.com/macros/s/AKfycbxCW8Op466dkEKlh6qR_qkH_niqqogphLMVFVYBRpetPp-f-eOK6oYBf79QY3RWeKAi/exec';
   // ▲
 
   const PT = 0.3528;           // 1 punt in mm
